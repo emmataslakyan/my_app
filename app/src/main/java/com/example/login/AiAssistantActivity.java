@@ -33,7 +33,7 @@ public class AiAssistantActivity extends BaseActivity {
     // Groq Connection Essentials
     private final OkHttpClient client = new OkHttpClient();
     // Get your free key at https://console.groq.com/keys
-    private final String GROQ_API_KEY = "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";
+    private final String GROQ_API_KEY = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
