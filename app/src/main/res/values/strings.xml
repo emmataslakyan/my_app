@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Firebase Google Authentication</string>
+    <string name="client_id">52855905169-0qem51t392135e5am4vbm6cb94iqlvou.apps.googleusercontent.com</string>
+    <string name="default_web_client_id">52855905169-0qem51t392135e5am4vbm6cb94iqlvou.apps.googleusercontent.com</string>
+    <string name="login_header">Login</string>
+    <string name="title_register">Sign Up</string>
+    <string name="reset_password_title">Reset Password</string>
+    <string name="reset_password_sub">Enter your email to receive a reset link</string>
+    <string name="title_my_resumes">My Resumes</string>
+
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="hint_confirm_password">Confirm Password</string>
+
+    <string name="btn_login">Sign In</string>
+    <string name="btn_register">Register</string>
+    <string name="btn_send_reset">Send Reset Link</string>
+    <string name="btn_logout">Log Out</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="link_register">Do not have an account? Sign up</string>
+    <string name="link_login">Already have an account? Login</string>
+    <string name="back_to_login">Back to Login</string>
+
+    <string name="menu_profile">Profile Settings</string>
+    <string name="menu_resume">Create or Edit Resume</string>
+    <string name="menu_ai">AI Suggestions</string>
+    <string name="ai_hint">Ask Spark something...</string>
+    <string name="menu_opps">Discover Opportunities</string>
+
+    <string name="error_empty_email">Please enter your email</string>
+    <string name="msg_reset_sent">Reset link sent to your email!</string>
+
+    <string name="dashboard_title">Dashboard</string>
+    <string name="my_profile">My Profile</string>
+    <string name="profile_sub">Account settings &amp; status</string>
+    <string name="main_tools">Main Tools</string>
+    <string name="spark_assistant">Spark Assistant</string>
+    <string name="resume_builder">Resume Builder</string>
+    <string name="discover_opps">Discover Opportunities</string>
+    <string name="pdf_tools">PDF Tools</string>
+    <string name="btn_merge">Merge</string>
+    <string name="btn_split">Split</string>
+    <string name="btn_compress">Compress</string>
+    <string name="btn_img_to_pdf">Img to PDF</string>
+
+    <string name="sections_header">Sections</string>
+    <string name="education">Education</string>
+    <string name="experience">Experience</string>
+    <string name="volunteering">Volunteering</string>
+    <string name="skills">Skills</string>
+    <string name="languages">Languages</string>
+    <string name="projects">Projects</string>
+    <string name="add_more_section">Add More Section</string>
+    <string name="view_resume">View Resume</string>
+    <string name="view">View</string>
+
+    <string name="edit_profile">Edit</string>
+    <string name="choose_template">Choose Template</string>
+    <string name="select_language">Select Language</string>
+    <string name="menu_duplicate">Duplicate</string>
+    <string name="menu_delete">Delete</string>
+    <string name="copy_label">(Copy)</string>
+    <string name="msg_deleted">Deleted</string>
+    <string name="msg_duplicated">Duplicated</string>
+
+</resources>

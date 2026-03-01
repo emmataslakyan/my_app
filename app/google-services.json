@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "52855905169",
+    "project_id": "skillspark-c2ad3",
+    "storage_bucket": "skillspark-c2ad3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:52855905169:android:915b27f94ca7be9214d830",
+        "android_client_info": {
+          "package_name": "com.example.login"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "52855905169-6p4lnn6uokdts6ipaq7d3d6kg9rpmfo1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.login",
+            "certificate_hash": "5b051171495be7b01f2c16ccc8aae3be54fa2751"
+          }
+        },
+        {
+          "client_id": "52855905169-0qem51t392135e5am4vbm6cb94iqlvou.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA8eyYwjmJCJThfc7x1MaLeR1QL64w-CHo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "52855905169-0qem51t392135e5am4vbm6cb94iqlvou.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

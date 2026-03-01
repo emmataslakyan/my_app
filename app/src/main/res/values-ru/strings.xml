@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+        <string name="app_name">Firebase Google Authentication</string>
+        <string name="client_id">52855905169-0qem51t392135e5am4vbm6cb94iqlvou.apps.googleusercontent.com</string>
+        <string name="login_header">Войти</string>
+        <string name="title_register">Регистрация</string>
+        <string name="reset_password_title">Сброс пароля</string>
+        <string name="reset_password_sub">Введите ваш email для получения ссылки</string>
+        <string name="title_my_resumes">Мои резюме</string>
+
+        <string name="hint_email">Эл. Почта</string>
+        <string name="hint_password">Пароль</string>
+        <string name="hint_confirm_password">Подтвердите пароль</string>
+
+        <string name="btn_login">Вход</string>
+        <string name="btn_register">Зарегистрироваться</string>
+        <string name="btn_send_reset">Отправить ссылку</string>
+        <string name="btn_logout">Выйти</string>
+        <string name="forgot_password">Забыли пароль?</string>
+        <string name="link_register">Нет аккаунта? Регистрация</string>
+        <string name="link_login">Уже есть аккаунт? Войти</string>
+        <string name="back_to_login">Назад к входу</string>
+
+        <string name="menu_profile">Настройки профиля</string>
+        <string name="menu_resume">Создать или изменить резюме</string>
+        <string name="menu_ai">ИИ-предложения</string>
+        <string name="ai_hint">Задайте Spark вопрос...</string>
+        <string name="menu_opps">Поиск возможностей</string>
+
+        <string name="error_empty_email">Пожалуйста, введите ваш email</string>
+        <string name="msg_reset_sent">Ссылка для сброса отправлена на почту!</string>
+
+        <string name="dashboard_title">Панель управления</string>
+        <string name="my_profile">Мой профиль</string>
+        <string name="profile_sub">Настройки аккаунта и статус</string>
+        <string name="main_tools">Основные инструменты</string>
+        <string name="spark_assistant">Ассистент Spark</string>
+        <string name="resume_builder">Конструктор резюме</string>
+        <string name="discover_opps">Поиск возможностей</string>
+        <string name="pdf_tools">Инструменты PDF</string>
+        <string name="btn_merge">Объединить</string>
+        <string name="btn_split">Разделить</string>
+        <string name="btn_compress">Сжать</string>
+        <string name="btn_img_to_pdf">Картинка в PDF</string>
+
+        <string name="sections_header">Разделы</string>
+        <string name="education">Образование</string>
+        <string name="experience">Опыт работы</string>
+        <string name="volunteering">Волонтерство</string>
+        <string name="skills">Навыки</string>
+        <string name="languages">Языки</string>
+        <string name="projects">Проекты</string>
+        <string name="add_more_section">Добавить раздел</string>
+        <string name="view_resume">Посмотреть резюме</string>
+        <string name="view">Посмотреть</string>
+
+        <string name="edit_profile">Редактировать</string>
+        <string name="choose_template">Выбрать шаблон</string>
+        <string name="select_language">Выберите язык</string>
+        <string name="menu_duplicate">Дублировать</string>
+        <string name="menu_delete">Удалить</string>
+        <string name="copy_label">(Копия)</string>
+        <string name="msg_deleted">Удалено</string>
+        <string name="msg_duplicated">Создана копия</string>
+
+</resources>
