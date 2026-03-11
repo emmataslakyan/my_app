@@ -44,6 +44,7 @@
         <string name="btn_img_to_pdf">Картинка в PDF</string>
 
         <string name="sections_header">Разделы</string>
+        <string name="personal_details">Личные данные</string>
         <string name="education">Образование</string>
         <string name="experience">Опыт работы</string>
         <string name="volunteering">Волонтерство</string>
@@ -63,4 +64,6 @@
         <string name="msg_deleted">Удалено</string>
         <string name="msg_duplicated">Создана копия</string>
 
+        <string name="btn_download">Download</string>
+        <string name="title_template">Template</string>
 </resources>

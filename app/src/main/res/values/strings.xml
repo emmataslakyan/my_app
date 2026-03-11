@@ -45,6 +45,8 @@
     <string name="btn_img_to_pdf">Img to PDF</string>
 
     <string name="sections_header">Sections</string>
+    <string name="personal_details">Personal Details</string>
+    <string name="education_profile">My Profile</string>
     <string name="education">Education</string>
     <string name="experience">Experience</string>
     <string name="volunteering">Volunteering</string>
@@ -63,5 +65,8 @@
     <string name="copy_label">(Copy)</string>
     <string name="msg_deleted">Deleted</string>
     <string name="msg_duplicated">Duplicated</string>
+
+    <string name="btn_download">Download</string>
+    <string name="title_template">Template</string>
 
 </resources>

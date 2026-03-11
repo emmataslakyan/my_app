@@ -9,13 +9,11 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.button.MaterialButton;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 public class ResumeAdapter extends RecyclerView.Adapter<ResumeAdapter.ViewHolder> {
 
@@ -41,18 +39,20 @@ public class ResumeAdapter extends RecyclerView.Adapter<ResumeAdapter.ViewHolder
         Context context = holder.itemView.getContext();
 
         // Bind data to XML views
-        holder.nameText.setText(resume.getTitle());
+        // Use getName() if available, otherwise title
+        String displayName = (resume.getName() != null && !resume.getName().isEmpty())
+                ? resume.getName() : resume.getTitle();
+
+        holder.nameText.setText(displayName);
         holder.emailText.setText(resume.getEmail());
         holder.dateText.setText(resume.getDate());
 
-        // Edit button goes to the ProfileActivity cards
         holder.editBtn.setOnClickListener(v -> {
-            Intent intent = new Intent(context, ProfileActivity.class);
+            Intent intent = new Intent(context, ResumeEditorActivity.class);
             intent.putExtra("RESUME_ID", resume.getId());
             context.startActivity(intent);
         });
 
-        // Menu More (Delete/Duplicate)
         holder.menuMore.setOnClickListener(v -> {
             PopupMenu popup = new PopupMenu(context, holder.menuMore);
             popup.getMenu().add(0, 0, 0, "Duplicate");
@@ -60,7 +60,7 @@ public class ResumeAdapter extends RecyclerView.Adapter<ResumeAdapter.ViewHolder
 
             popup.setOnMenuItemClickListener(item -> {
                 int currentPos = holder.getAdapterPosition();
-                if (item.getItemId() == 1) {
+                if (item.getItemId() == 1) { // DELETE
                     new Thread(() -> {
                         db.resumeDao().delete(resume);
                         ((Activity) context).runOnUiThread(() -> {
@@ -68,13 +68,25 @@ public class ResumeAdapter extends RecyclerView.Adapter<ResumeAdapter.ViewHolder
                             notifyItemRemoved(currentPos);
                         });
                     }).start();
-                } else if (item.getItemId() == 0) {
+                } else if (item.getItemId() == 0) { // DUPLICATE
                     new Thread(() -> {
-                        String date = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(new Date());
-                        Resume copy = new Resume(resume.getTitle() + " Copy", resume.getEmail(), date);
-                        db.resumeDao().insert(copy);
+                        // Create a copy of the current resume
+                        Resume duplicate = new Resume();
+                        duplicate.setTitle(resume.getTitle() + " (Copy)");
+                        duplicate.setName(resume.getName());
+                        duplicate.setEmail(resume.getEmail());
+                        duplicate.setDate("Copied: " + java.text.DateFormat.getDateInstance().format(new java.util.Date()));
+
+                        db.resumeDao().insert(duplicate);
+
+                        // Refresh the full list from DB to show the new item
+                        List<Resume> updatedList = db.resumeDao().getAllResumes();
+
                         ((Activity) context).runOnUiThread(() -> {
-                            if (context instanceof MyResumesActivity) ((MyResumesActivity) context).loadResumes();
+                            resumes.clear();
+                            resumes.addAll(updatedList);
+                            notifyDataSetChanged();
+                            Toast.makeText(context, "Resume Duplicated", Toast.LENGTH_SHORT).show();
                         });
                     }).start();
                 }

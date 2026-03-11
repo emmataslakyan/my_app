@@ -11,51 +11,64 @@ import java.util.concurrent.Executors;
 
 public class TemplateSelectionActivity extends BaseActivity {
 
+    private int currentResumeId = -1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_template_selection);
 
-        // Back Button logic
+        // Receive the ID from the previous activity
+        currentResumeId = getIntent().getIntExtra("RESUME_ID", -1);
+
         ImageButton backBtn = findViewById(R.id.backBtn);
         if (backBtn != null) {
             backBtn.setOnClickListener(v -> finish());
         }
 
-        // Setup Template Click Listeners
-        findViewById(R.id.template1).setOnClickListener(v -> saveResume());
-        findViewById(R.id.template2).setOnClickListener(v -> saveResume());
-        findViewById(R.id.template3).setOnClickListener(v -> saveResume());
-        findViewById(R.id.template4).setOnClickListener(v -> saveResume());
-        findViewById(R.id.template5).setOnClickListener(v -> saveResume());
-        findViewById(R.id.template6).setOnClickListener(v -> saveResume());
+        // Set listeners for each template button
+        findViewById(R.id.template1).setOnClickListener(v -> updateResume("Template 1"));
+        findViewById(R.id.template2).setOnClickListener(v -> updateResume("Template 2"));
+        findViewById(R.id.template3).setOnClickListener(v -> updateResume("Template 3"));
+        findViewById(R.id.template4).setOnClickListener(v -> updateResume("Template 4"));
+        findViewById(R.id.template5).setOnClickListener(v -> updateResume("Template 5"));
+        findViewById(R.id.template6).setOnClickListener(v -> updateResume("Template 6"));
     }
 
-    private void saveResume() {
-        // Generate current metadata
-        String date = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(new Date());
-        String userEmail = "user@example.com";
-
-        // Create the Resume object with "My Resume" as the title
-        Resume newResume = new Resume("My Resume", userEmail, date);
+    private void updateResume(String templateName) {
+        String currentDate = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(new Date());
 
         Executors.newSingleThreadExecutor().execute(() -> {
-            // SINGLE INSERTION POINT: This happens only once when a template is clicked
-            AppDatabase.getInstance(TemplateSelectionActivity.this).resumeDao().insert(newResume);
+            AppDatabase db = AppDatabase.getInstance(TemplateSelectionActivity.this);
 
-            runOnUiThread(() -> {
-                Toast.makeText(this, "Resume Saved Successfully!", Toast.LENGTH_SHORT).show();
+            // 1. Fetch the existing resume by its primary key (ID)
+            Resume existingResume = db.resumeDao().getResumeById(currentResumeId);
 
-                // Navigate to My Resumes list
-                Intent intent = new Intent(TemplateSelectionActivity.this, MyResumesActivity.class);
+            if (existingResume != null) {
+                // 2. Update the existing object
+                existingResume.setDate(currentDate);
 
-                // FLAG_ACTIVITY_CLEAR_TOP ensures that if the user presses back from the list,
-                // they don't loop back into the template picker.
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                // 3. Persist the change via UPDATE (not insert)
+                db.resumeDao().update(existingResume);
 
-                startActivity(intent);
-                finish();
-            });
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "Template Selected!", Toast.LENGTH_SHORT).show();
+
+                    // Change the destination from MyResumesActivity to ResumePreviewActivity
+                    Intent intent = new Intent(TemplateSelectionActivity.this, ResumePreviewActivity.class);
+
+                    // Crucial: Pass the currentResumeId so the preview page knows which data to load
+                    intent.putExtra("RESUME_ID", currentResumeId);
+
+                    // This clears the middle activities so 'Back' from Preview goes to the main list
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+                    startActivity(intent);
+                    finish(); // Close the selection screen
+                });
+            } else {
+                runOnUiThread(() -> Toast.makeText(this, "Error: Resume data lost", Toast.LENGTH_SHORT).show());
+            }
         });
     }
 }

@@ -9,7 +9,6 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 
-// Change 1: Extend BaseActivity instead of AppCompatActivity
 public class RegisterActivity extends BaseActivity {
 
     EditText email, password, confirmPassword;
@@ -23,7 +22,6 @@ public class RegisterActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        // Change 2: Setup the Back button and Language menu from BaseActivity
         setupCommonToolbar();
 
         mAuth = FirebaseAuth.getInstance();
@@ -57,17 +55,13 @@ public class RegisterActivity extends BaseActivity {
         mAuth.createUserWithEmailAndPassword(mail, pass)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        // 1. CLEAR THE AUTOMATIC SESSION
-                        // Firebase logs them in by default; we must undo that here.
+
                         mAuth.signOut();
 
                         Toast.makeText(RegisterActivity.this, "Registration Successful! Please login.", Toast.LENGTH_SHORT).show();
 
-                        // 2. REDIRECT TO LOGIN (MainActivity)
                         Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
 
-                        // 3. CLEAR THE STACK
-                        // This ensures the "Back" button doesn't take them back to the registration form
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
                         startActivity(intent);

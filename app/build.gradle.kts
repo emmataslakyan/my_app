@@ -46,11 +46,13 @@ android {
 dependencies {
     implementation(libs.activity)
     implementation(libs.cardview)
+    implementation(libs.coordinatorlayout)
     val roomVersion = "2.6.1"
 
     // Room
     implementation("androidx.room:room-runtime:$roomVersion")
     kapt("androidx.room:room-compiler:$roomVersion")
+
 
     // Firebase
     implementation(platform("com.google.firebase:firebase-bom:33.10.0"))

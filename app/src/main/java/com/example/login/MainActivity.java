@@ -46,7 +46,6 @@ public class MainActivity extends BaseActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
-        // 1. Initialize Views
         emailInput = findViewById(R.id.email_input);
         passwordInput = findViewById(R.id.password_input);
         loginBtn = findViewById(R.id.login_btn);
@@ -55,12 +54,10 @@ public class MainActivity extends BaseActivity {
         forgotPassword = findViewById(R.id.forgot_password);
         View langBtn = findViewById(R.id.btn_language_menu);
 
-        // 2. Button Listeners
         if (langBtn != null) langBtn.setOnClickListener(v -> showModernLanguageSheet());
 
         if (googleBtn != null) googleBtn.setOnClickListener(v -> startGoogleLogin());
 
-        // FIXED: Forgot Password Listener
         if (forgotPassword != null) {
             forgotPassword.setOnClickListener(v -> {
                 startActivity(new Intent(MainActivity.this, ForgotPasswordActivity.class));
@@ -82,7 +79,6 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    // FIXED: Automatic Session Login
     @Override
     protected void onStart() {
         super.onStart();

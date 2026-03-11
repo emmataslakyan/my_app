@@ -28,7 +28,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ViewHold
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // This inflates the individual card layout
+
         View v = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_resume, parent, false);
         return new ViewHolder(v);
@@ -43,7 +43,6 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ViewHold
         h.email.setText(p.getEmail());
         h.date.setText(p.getDate());
 
-        // Setting up click listeners for the buttons
         h.edit.setOnClickListener(v -> {
             if (listener != null) listener.onEditClick(p);
         });

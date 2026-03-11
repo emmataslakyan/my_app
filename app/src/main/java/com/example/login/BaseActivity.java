@@ -12,7 +12,7 @@ public class BaseActivity extends AppCompatActivity {
     protected PopupMenu languagePopup;
 
     protected void setupCommonToolbar() {
-        // We use the IDs from your XML
+
         View backBtn = findViewById(R.id.backBtn);
         View langBtn = findViewById(R.id.btn_language_menu);
 

@@ -4,18 +4,23 @@ import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Update;
 import java.util.List;
 
 @Dao
 public interface ResumeDao {
     @Insert
-    void insert(Resume resume);
+    long insert(Resume resume); // Must return long to get the new ID
+
+    @Update
+    void update(Resume resume);
+
+    @Query("SELECT * FROM resumes WHERE id = :id")
+    Resume getResumeById(int id);
+
+    @Query("SELECT * FROM resumes")
+    List<Resume> getAllResumes();
 
     @Delete
     void delete(Resume resume);
-
-    // FIX: Changed 'resume_table' to 'resumes' to match standard naming
-    // If your Resume class doesn't have a tableName, use 'Resume' here
-    @Query("SELECT * FROM resumes ORDER BY id DESC")
-    List<Resume> getAllResumes();
 }

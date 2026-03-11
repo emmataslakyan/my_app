@@ -27,7 +27,6 @@ public class ProfileActivity extends BaseActivity {
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser user = mAuth.getCurrentUser();
 
-        // 1. Display User Info
         TextView profileUsername = findViewById(R.id.profile_username);
         TextView profileEmail = findViewById(R.id.profile_email);
         if (user != null) {
@@ -35,19 +34,15 @@ public class ProfileActivity extends BaseActivity {
             profileEmail.setText(user.getEmail());
         }
 
-        // 2. Setup Toolbar (Back and Language)
         setupCustomToolbar();
 
-        // 3. Setup Resume Section Cards
         setupSectionCards();
 
-        // 4. Logout Button Logic
         Button logoutBtn = findViewById(R.id.logout_button);
         if (logoutBtn != null) {
             logoutBtn.setOnClickListener(v -> performLogout());
         }
 
-        // 5. Bottom Bar Logic
         LinearLayout bottomBar = findViewById(R.id.bottomBar);
         if (bottomBar != null) {
             bottomBar.setOnClickListener(v -> {
@@ -60,7 +55,6 @@ public class ProfileActivity extends BaseActivity {
         ImageView btnBack = findViewById(R.id.btn_back);
         ImageView btnLang = findViewById(R.id.btn_language_menu);
 
-        // Back to Home
         if (btnBack != null) {
             btnBack.setOnClickListener(v -> {
                 startActivity(new Intent(ProfileActivity.this, HomeActivity.class));
@@ -68,7 +62,6 @@ public class ProfileActivity extends BaseActivity {
             });
         }
 
-        // Language Switcher (Uses your modern sheet logic)
         if (btnLang != null) {
             btnLang.setOnClickListener(v -> showModernLanguageSheet());
         }
@@ -116,7 +109,7 @@ public class ProfileActivity extends BaseActivity {
             CardView card = findViewById(id);
             if (card != null) {
                 card.setOnClickListener(v -> {
-                    // Navigate to Editor for any section click
+
                     startActivity(new Intent(this, ResumeEditorActivity.class));
                 });
             }
