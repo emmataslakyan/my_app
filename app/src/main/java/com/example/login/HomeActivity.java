@@ -70,7 +70,7 @@ public class HomeActivity extends BaseActivity {
         // --- Opportunities Section ---
         if (opportunitiesSection != null) {
             opportunitiesSection.setOnClickListener(v ->
-                    Toast.makeText(this, R.string.menu_opps, Toast.LENGTH_SHORT).show());
+                    startActivity(new Intent(this, OpportunitiesActivity.class)));
         }
     }
 

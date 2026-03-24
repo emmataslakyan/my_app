@@ -21,6 +21,9 @@ xmlns:tools="http://schemas.android.com/tools">
         android:value="AIzaSyDxiQAxxDS-SpNtDHelAR0UHOzgAzE-ito" />
 
     <activity
+        android:name=".OpportunitiesActivity"
+        android:exported="false" />
+    <activity
         android:name=".ResumeEditorActivity"
         android:exported="false" />
     <activity
