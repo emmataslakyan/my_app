@@ -34,6 +34,7 @@
                 android:layout_height="100dp"
                 android:layout_centerHorizontal="true"
                 android:src="@drawable/profile2"
+                android:tint="#2C1243"
                 app:shapeAppearanceOverlay="@style/CircleImage" />
 
             <TextView
@@ -97,7 +98,7 @@
                     android:layout_height="55dp"
                     android:layout_marginEnd="8dp"
                     android:layout_weight="1"
-                    android:backgroundTint="#491B92"
+                    app:backgroundTint="#502677"
                     android:text="@string/edit_profile"
                     android:textAllCaps="false"
                     android:textColor="#FFFFFF"
@@ -111,7 +112,7 @@
                     android:layout_height="55dp"
                     android:layout_marginStart="8dp"
                     android:layout_weight="1"
-                    android:backgroundTint="#421594"
+                    app:backgroundTint="#502677"
                     android:text="@string/view"
                     android:textAllCaps="false"
                     android:textColor="#FFFFFF"

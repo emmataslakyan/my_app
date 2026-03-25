@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-        <string name="app_name">Firebase Google Authentication</string>
+        <string name="app_name">SkillSpark</string>
         <string name="client_id">52855905169-0qem51t392135e5am4vbm6cb94iqlvou.apps.googleusercontent.com</string>
+        <string name="default_web_client_id">52855905169-0qem51t392135e5am4vbm6cb94iqlvou.apps.googleusercontent.com</string>
         <string name="login_header">Войти</string>
         <string name="title_register">Регистрация</string>
         <string name="reset_password_title">Сброс пароля</string>
@@ -24,7 +25,7 @@
         <string name="menu_profile">Настройки профиля</string>
         <string name="menu_resume">Создать или изменить резюме</string>
         <string name="menu_ai">ИИ-предложения</string>
-        <string name="ai_hint">Задайте Spark вопрос...</string>
+        <string name="ai_hint">Задайте Spark вопрос…</string>
         <string name="menu_opps">Поиск возможностей</string>
 
         <string name="error_empty_email">Пожалуйста, введите ваш email</string>
@@ -43,8 +44,10 @@
         <string name="btn_compress">Сжать</string>
         <string name="btn_img_to_pdf">Картинка в PDF</string>
 
-        <string name="sections_header">Разделы</string>
+        <!-- Section labels (editor list) -->
+        <string name="sections_header">РАЗДЕЛЫ</string>
         <string name="personal_details">Личные данные</string>
+        <string name="education_profile">Мой профиль</string>
         <string name="education">Образование</string>
         <string name="experience">Опыт работы</string>
         <string name="volunteering">Волонтерство</string>
@@ -52,8 +55,33 @@
         <string name="languages">Языки</string>
         <string name="projects">Проекты</string>
         <string name="add_more_section">Добавить раздел</string>
-        <string name="view_resume">Посмотреть резюме</string>
+        <string name="view_resume">ПОСМОТРЕТЬ РЕЗЮМЕ</string>
         <string name="view">Посмотреть</string>
+
+        <!-- Section card labels — used in activity_resume_editor.xml -->
+        <string name="section_personal">Личные данные</string>
+        <string name="section_education">Образование</string>
+        <string name="section_experience">Опыт работы</string>
+        <string name="section_skills">Навыки</string>
+        <string name="section_volunteering">Волонтерство</string>
+        <string name="section_languages">Языки</string>
+        <string name="section_projects">Проекты</string>
+        <string name="section_awards">Достижения и награды</string>
+
+        <!-- Заголовки разделов в предпросмотре резюме -->
+        <string name="label_education">ОБРАЗОВАНИЕ</string>
+        <string name="label_experience">ОПЫТ РАБОТЫ</string>
+        <string name="label_volunteering">ВОЛОНТЕРСТВО</string>
+        <string name="label_projects">ПРОЕКТЫ</string>
+        <string name="label_languages">ЯЗЫКИ</string>
+        <string name="label_skills">НАВЫКИ</string>
+        <string name="label_awards">ДОСТИЖЕНИЯ И НАГРАДЫ</string>
+
+        <!-- Accessibility content descriptions -->
+        <string name="desc_back">Назад</string>
+        <string name="desc_edit_sections">Переименовать разделы</string>
+        <string name="desc_section_icon">Иконка раздела</string>
+        <string name="desc_chevron">Открыть раздел</string>
 
         <string name="edit_profile">Редактировать</string>
         <string name="choose_template">Выбрать шаблон</string>
@@ -64,6 +92,7 @@
         <string name="msg_deleted">Удалено</string>
         <string name="msg_duplicated">Создана копия</string>
 
-        <string name="btn_download">Download</string>
-        <string name="title_template">Template</string>
+        <string name="btn_download">Скачать</string>
+        <string name="title_template">Шаблон</string>
+
 </resources>

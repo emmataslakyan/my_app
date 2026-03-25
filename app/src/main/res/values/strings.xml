@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Firebase Google Authentication</string>
+    <string name="app_name">SkillSpark</string>
     <string name="client_id">52855905169-0qem51t392135e5am4vbm6cb94iqlvou.apps.googleusercontent.com</string>
     <string name="default_web_client_id">52855905169-0qem51t392135e5am4vbm6cb94iqlvou.apps.googleusercontent.com</string>
     <string name="login_header">Login</string>
@@ -25,7 +25,7 @@
     <string name="menu_profile">Profile Settings</string>
     <string name="menu_resume">Create or Edit Resume</string>
     <string name="menu_ai">AI Suggestions</string>
-    <string name="ai_hint">Ask Spark something...</string>
+    <string name="ai_hint">Ask Spark something…</string>
     <string name="menu_opps">Discover Opportunities</string>
 
     <string name="error_empty_email">Please enter your email</string>
@@ -44,7 +44,8 @@
     <string name="btn_compress">Compress</string>
     <string name="btn_img_to_pdf">Img to PDF</string>
 
-    <string name="sections_header">Sections</string>
+    <!-- Section labels (editor list) -->
+    <string name="sections_header">SECTIONS</string>
     <string name="personal_details">Personal Details</string>
     <string name="education_profile">My Profile</string>
     <string name="education">Education</string>
@@ -54,8 +55,33 @@
     <string name="languages">Languages</string>
     <string name="projects">Projects</string>
     <string name="add_more_section">Add More Section</string>
-    <string name="view_resume">View Resume</string>
+    <string name="view_resume">VIEW RESUME</string>
     <string name="view">View</string>
+
+    <!-- Section card labels — used in activity_resume_editor.xml -->
+    <string name="section_personal">Personal Details</string>
+    <string name="section_education">Education</string>
+    <string name="section_experience">Experience</string>
+    <string name="section_skills">Skills</string>
+    <string name="section_volunteering">Volunteering</string>
+    <string name="section_languages">Languages</string>
+    <string name="section_projects">Projects</string>
+    <string name="section_awards">Honors &amp; Awards</string>
+
+    <!-- Resume preview section header labels -->
+    <string name="label_education">EDUCATION</string>
+    <string name="label_experience">EXPERIENCE</string>
+    <string name="label_volunteering">VOLUNTEERING</string>
+    <string name="label_projects">PROJECTS</string>
+    <string name="label_languages">LANGUAGES</string>
+    <string name="label_skills">SKILLS</string>
+    <string name="label_awards">HONORS &amp; AWARDS</string>
+
+    <!-- Accessibility content descriptions -->
+    <string name="desc_back">Back</string>
+    <string name="desc_edit_sections">Edit section names</string>
+    <string name="desc_section_icon">Section icon</string>
+    <string name="desc_chevron">Open section</string>
 
     <string name="edit_profile">Edit</string>
     <string name="choose_template">Choose Template</string>

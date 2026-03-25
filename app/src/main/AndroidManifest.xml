@@ -1,59 +1,105 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools">
 
-<uses-permission android:name="android.permission.INTERNET" />
-<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
 
-<application
-    android:usesCleartextTraffic="true"
-    android:allowBackup="true"
-    android:dataExtractionRules="@xml/data_extraction_rules"
-    android:fullBackupContent="@xml/backup_rules"
-    android:icon="@mipmap/ic_launcher"
-    android:label="@string/app_name"
-    android:roundIcon="@mipmap/ic_launcher_round"
-    android:supportsRtl="true"
-    android:theme="@style/Theme.Login">
+    <application
+        android:resource="@xml/file_paths"
+        android:requestLegacyExternalStorage="true"
+        android:usesCleartextTraffic="true"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@drawable/spark1"
+        android:label="@string/app_name"
+        android:roundIcon="@drawable/spark1"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Login">
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDxiQAxxDS-SpNtDHelAR0UHOzgAzE-ito" />
+        <activity
+            android:name=".OpportunitiesActivity"
+            android:exported="false" />
 
-    <meta-data
-        android:name="com.google.android.geo.API_KEY"
-        android:value="AIzaSyDxiQAxxDS-SpNtDHelAR0UHOzgAzE-ito" />
+        <activity
+            android:name=".ProjectsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ResumePreviewActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ResumeViewActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AddSectionActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".LanguagesActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".PersonalDetailsActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".EducationActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".ExperienceActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".VolunteeringActivity"
+            android:exported="false"/> <activity
+        android:name=".SkillsActivity"
+        android:exported="false"/>
 
-    <activity
-        android:name=".ResumeEditorActivity"
-        android:exported="false" />
-    <activity
-        android:name=".AiAssistantActivity"
-        android:exported="false" />
-    <activity
-        android:name=".ForgotPasswordActivity"
-        android:exported="false" />
-    <activity
-        android:name=".MyResumesActivity"
-        android:exported="false" />
-    <activity
-        android:name=".ProfileActivity"
-        android:exported="false" />
-    <activity
-        android:name=".HomeActivity"
-        android:exported="false" />
-    <activity
-        android:name=".RegisterActivity"
-        android:exported="false" />
-    <activity
-        android:name=".TemplateSelectionActivity"
-        android:exported="false" />
+        <activity
+            android:name=".HomeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ResumeEditorActivity"
+            android:exported="false" />
+        <activity
+            android:name=".TemplateSelectionActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MyResumesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AiAssistantActivity"
+            android:exported="false" />
 
-    <activity
-        android:name=".MainActivity"
-        android:exported="true"
-        android:windowSoftInputMode="adjustResize">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
-    </activity>
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ForgotPasswordActivity"
+            android:exported="false" />
 
-</application>
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+    </application>
 </manifest>

@@ -1,5 +1,6 @@
 package com.example.login;
 
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
@@ -44,6 +45,10 @@ public class Resume {
     private String projectBullets;
     private String languages;
 
+    // Photo
+    @ColumnInfo(name = "photo_path")
+    private String photoPath;
+
     public Resume() {}
 
     @Ignore
@@ -68,6 +73,10 @@ public class Resume {
     public void setPhone(String phone) { this.phone = phone; }
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
+
+    // --- Photo ---
+    public String getPhotoPath() { return photoPath; }
+    public void setPhotoPath(String photoPath) { this.photoPath = photoPath; }
 
     // --- Education ---
     public String getSchoolName() { return schoolName; }

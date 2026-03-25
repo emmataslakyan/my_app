@@ -51,7 +51,7 @@ public class ExperienceActivity extends BaseActivity {
             if (adapter != null) adapter.addBullet();
         });
 
-        findViewById(R.id.btnSaveExp).setOnClickListener(v -> saveExperience());
+        findViewById(R.id.btnSave).setOnClickListener(v -> saveExperience());
 
         loadData();
     }

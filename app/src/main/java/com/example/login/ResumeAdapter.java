@@ -52,7 +52,15 @@ public class ResumeAdapter extends RecyclerView.Adapter<ResumeAdapter.ViewHolder
             intent.putExtra("RESUME_ID", resume.getId());
             context.startActivity(intent);
         });
+        holder.viewBtn.setOnClickListener(v -> {
+            // Use TemplateSelectionActivity (the class you provided)
+            Intent intent = new Intent(context, TemplateSelectionActivity.class);
 
+            // Pass the resume ID so the template page knows which resume we are working with
+            intent.putExtra("RESUME_ID", resume.getId());
+
+            context.startActivity(intent);
+        });
         holder.menuMore.setOnClickListener(v -> {
             PopupMenu popup = new PopupMenu(context, holder.menuMore);
             popup.getMenu().add(0, 0, 0, "Duplicate");
