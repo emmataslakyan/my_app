@@ -71,7 +71,7 @@ public class HomeActivity extends BaseActivity {
 
         if (opportunitiesSection != null) {
             opportunitiesSection.setOnClickListener(v ->
-                    Toast.makeText(this, R.string.menu_opps, Toast.LENGTH_SHORT).show());
+                    startActivity(new Intent(this, OpportunitiesActivity.class)));
         }
     }
 
