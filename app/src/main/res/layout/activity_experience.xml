@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@drawable/glass_card">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -36,7 +36,7 @@
                 android:layout_marginEnd="8dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@android:drawable/ic_menu_info_details"
-                app:tint="@color/black" />
+                app:tint="#380562" />
 
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
@@ -185,13 +185,16 @@
                 android:textAllCaps="false" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSaveExp"
+                android:id="@+id/btnSave"
+                android:background="@drawable/buttonn"
+                app:backgroundTint="#6C4EA5"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="24dp"
                 android:text="Save Details"
-                app:cornerRadius="12dp"
-                android:backgroundTint="#491B92" />
+                android:textAllCaps="false"
+                android:textSize="16sp"
+                app:cornerRadius="12dp" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

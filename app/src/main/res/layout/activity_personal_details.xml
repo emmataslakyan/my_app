@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@drawable/glass_card">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -66,8 +66,9 @@
                 android:background="#F0F0F0"
                 android:padding="2dp"
                 android:src="@drawable/icon_account_circle"
+                app:tint="#46186E"
                 app:shapeAppearanceOverlay="@style/CircleImage"
-                app:strokeColor="#491B92"
+                app:strokeColor="#4B1F72"
                 app:strokeWidth="2dp" />
 
             <TextView
@@ -169,12 +170,14 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSave"
+                android:background="@drawable/buttonn"
+                app:backgroundTint="#502677"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
+                android:layout_marginTop="24dp"
                 android:text="Save Details"
                 android:textAllCaps="false"
                 android:textSize="16sp"
-                android:backgroundTint="#491B92"
                 app:cornerRadius="12dp" />
 
         </LinearLayout>

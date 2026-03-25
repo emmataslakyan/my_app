@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/resumeCaptureArea"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
@@ -11,100 +12,308 @@
         android:orientation="vertical"
         android:padding="32dp">
 
+        <!-- ── Name ── -->
         <TextView
             android:id="@+id/previewName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:textAllCaps="true"
             android:textColor="#000000"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
+        <!-- ── Contact ── -->
         <TextView
             android:id="@+id/previewContactInfo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:textSize="11sp"
-            android:layout_marginTop="2dp" />
+            android:layout_marginTop="2dp"
+            android:textColor="#000000"
+            android:textSize="11sp" />
 
+        <!-- ══ EDUCATION ══ -->
         <LinearLayout
             android:id="@+id/sectionEducation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginTop="12dp">
+            android:layout_marginTop="10dp">
 
             <TextView
                 android:id="@+id/labelEducation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textStyle="bold"
+                android:text="@string/label_education"
                 android:textColor="#000000"
-                android:textSize="12sp" />
+                android:textSize="11sp"
+                android:textStyle="bold" />
 
-            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#000000" android:layout_marginTop="1dp" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="1dp"
+                android:background="#000000" />
 
-            <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp">
+            <!--
+                Use LinearLayout instead of RelativeLayout to avoid
+                overlap warning when text expands due to localization.
+            -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="4dp">
+
                 <TextView
                     android:id="@+id/previewEduName"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
-                    android:layout_toStartOf="@+id/previewEduLocation"
-                    android:textStyle="bold"
-                    android:textSize="11sp"
+                    android:layout_weight="1"
                     android:textColor="#000000"
-                    android:layout_marginEnd="8dp"/>
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
                 <TextView
                     android:id="@+id/previewEduLocation"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:textStyle="bold"
-                    android:textSize="11sp" />
-            </RelativeLayout>
+                    android:textColor="#000000"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/previewEduDesc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="11sp"
-                android:lineSpacingExtra="1dp" />
+                android:lineSpacingExtra="1dp"
+                android:textColor="#222222"
+                android:textSize="11sp" />
         </LinearLayout>
 
+        <!-- ══ EXPERIENCE ══ -->
         <LinearLayout
             android:id="@+id/sectionExperience"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginTop="12dp">
+            android:layout_marginTop="10dp">
 
             <TextView
                 android:id="@+id/labelExperience"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textStyle="bold"
+                android:text="@string/label_experience"
                 android:textColor="#000000"
-                android:textSize="12sp" />
+                android:textSize="11sp"
+                android:textStyle="bold" />
 
-            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#000000" android:layout_marginTop="1dp" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="1dp"
+                android:background="#000000" />
 
             <TextView
                 android:id="@+id/previewExpName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textStyle="bold"
+                android:layout_marginTop="2dp"
                 android:textColor="#000000"
                 android:textSize="11sp"
-                android:layout_marginTop="4dp" />
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/previewExpDesc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="11sp"
-                android:lineSpacingExtra="1dp" />
+                android:lineSpacingExtra="1dp"
+                android:textColor="#222222"
+                android:textSize="11sp" />
         </LinearLayout>
+
+        <!-- ══ VOLUNTEERING ══ -->
+        <LinearLayout
+            android:id="@+id/sectionVolunteering"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:id="@+id/labelVolunteering"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_volunteering"
+                android:textColor="#000000"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="1dp"
+                android:background="#000000" />
+
+            <TextView
+                android:id="@+id/previewVolName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textColor="#000000"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/previewVolDesc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:lineSpacingExtra="1dp"
+                android:textColor="#222222"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <!-- ══ PROJECTS ══ -->
+        <LinearLayout
+            android:id="@+id/sectionProjects"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:id="@+id/labelProjects"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_projects"
+                android:textColor="#000000"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="1dp"
+                android:background="#000000" />
+
+            <TextView
+                android:id="@+id/previewProjectName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textColor="#000000"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/previewProjectDesc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:lineSpacingExtra="1dp"
+                android:textColor="#222222"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <!-- ══ LANGUAGES ══ -->
+        <LinearLayout
+            android:id="@+id/sectionLanguages"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:id="@+id/labelLanguages"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_languages"
+                android:textColor="#000000"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="1dp"
+                android:background="#000000" />
+
+            <TextView
+                android:id="@+id/previewLanguages"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:lineSpacingExtra="1dp"
+                android:textColor="#222222"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <!-- ══ SKILLS ══ -->
+        <LinearLayout
+            android:id="@+id/sectionSkills"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:id="@+id/labelSkills"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_skills"
+                android:textColor="#000000"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="1dp"
+                android:background="#000000" />
+
+            <TextView
+                android:id="@+id/previewSkills"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:lineSpacingExtra="1dp"
+                android:textColor="#222222"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <!-- ══ HONORS & AWARDS ══ -->
+        <LinearLayout
+            android:id="@+id/sectionAwards"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:id="@+id/labelAwards"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/label_awards"
+                android:textColor="#000000"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="1dp"
+                android:background="#000000" />
+
+            <TextView
+                android:id="@+id/previewAwards"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:lineSpacingExtra="1dp"
+                android:textColor="#222222"
+                android:textSize="11sp" />
+        </LinearLayout>
+
     </LinearLayout>
 </ScrollView>

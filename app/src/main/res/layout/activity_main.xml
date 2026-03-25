@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/login_background"
+    android:background="@drawable/glass_card"
     android:padding="16dp"
     tools:context=".MainActivity">
 
@@ -44,7 +44,9 @@
             android:layout_height="150dp"
             android:layout_marginBottom="0dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/icon_account_circle" />
+            android:src="@drawable/icon_account_circle"
+            app:tint="#46186E"
+            app:strokeColor="#4B1F72"/>
 
         <TextView
             android:id="@+id/login_title"

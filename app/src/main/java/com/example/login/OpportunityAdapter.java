@@ -15,11 +15,11 @@ import java.util.List;
 
 public class OpportunityAdapter extends RecyclerView.Adapter<OpportunityAdapter.ViewHolder> {
 
-    private List<Opportunity> opportunities;
-    private List<Opportunity> filteredOpportunities;
+    private List<Opportunity> allOpportunities; // The master list
+    private List<Opportunity> filteredOpportunities; // The visible list
 
     public OpportunityAdapter(List<Opportunity> opportunities) {
-        this.opportunities = opportunities;
+        this.allOpportunities = new ArrayList<>(opportunities);
         this.filteredOpportunities = new ArrayList<>(opportunities);
     }
 
@@ -41,7 +41,7 @@ public class OpportunityAdapter extends RecyclerView.Adapter<OpportunityAdapter.
         holder.categoryChip.setText(opportunity.getCategory());
         holder.costChip.setText(opportunity.getCost());
 
-        if (opportunity.getLocation() != null && !opportunity.getLocation().isEmpty()) {
+        if (!opportunity.getLocation().isEmpty()) {
             holder.locationLayout.setVisibility(View.VISIBLE);
             holder.location.setText(opportunity.getLocation());
         } else {
@@ -49,8 +49,14 @@ public class OpportunityAdapter extends RecyclerView.Adapter<OpportunityAdapter.
         }
 
         holder.itemView.setOnClickListener(v -> {
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(opportunity.getUrl()));
-            v.getContext().startActivity(browserIntent);
+            String url = opportunity.getUrl();
+            if (!url.isEmpty()) {
+                if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                    url = "https://" + url;
+                }
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                v.getContext().startActivity(browserIntent);
+            }
         });
     }
 
@@ -62,21 +68,26 @@ public class OpportunityAdapter extends RecyclerView.Adapter<OpportunityAdapter.
     public void filter(String format, String category, String cost) {
         filteredOpportunities.clear();
 
-        for (Opportunity opp : opportunities) {
-            boolean matchesFormat = format.equals("All Formats") || opp.getFormat().equals(format);
-            boolean matchesCategory = category.equals("All Categories") || opp.getCategory().equals(category);
-            boolean matchesCost = cost.equals("All") || opp.getCost().equals(cost);
+        for (Opportunity opp : allOpportunities) {
+            // Case-insensitive matching + "All" logic
+            boolean matchesFormat = format.equalsIgnoreCase("All Formats") ||
+                    opp.getFormat().equalsIgnoreCase(format);
+
+            boolean matchesCategory = category.equalsIgnoreCase("All Categories") ||
+                    opp.getCategory().equalsIgnoreCase(category);
+
+            boolean matchesCost = cost.equalsIgnoreCase("All") ||
+                    opp.getCost().equalsIgnoreCase(cost);
 
             if (matchesFormat && matchesCategory && matchesCost) {
                 filteredOpportunities.add(opp);
             }
         }
-
         notifyDataSetChanged();
     }
 
     public void updateData(List<Opportunity> newOpportunities) {
-        this.opportunities = newOpportunities;
+        this.allOpportunities = new ArrayList<>(newOpportunities);
         this.filteredOpportunities = new ArrayList<>(newOpportunities);
         notifyDataSetChanged();
     }
