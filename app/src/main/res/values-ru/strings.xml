@@ -37,6 +37,7 @@
         <string name="main_tools">Основные инструменты</string>
         <string name="spark_assistant">Ассистент Spark</string>
         <string name="resume_builder">Конструктор резюме</string>
+        <string name="continue_building">Продолжить конструирование</string>
         <string name="discover_opps">Поиск возможностей</string>
         <string name="pdf_tools">Инструменты PDF</string>
         <string name="btn_merge">Объединить</string>

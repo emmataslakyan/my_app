@@ -7,12 +7,14 @@
     android:layout_height="match_parent"
     android:background="@drawable/glass_card">
 
+
     <RelativeLayout
         android:id="@+id/topBar"
         android:layout_width="0dp"  android:layout_height="73dp"
-        android:background="@drawable/header_gradient"
+        android:background="@drawable/glass_card"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"  app:layout_constraintEnd_toEndOf="parent"      tools:layout_editor_absoluteX="-2dp">
+
 
         <ImageButton
             android:id="@+id/backBtn"
@@ -23,15 +25,17 @@
             android:contentDescription="@string/desc_back"
             android:foreground="@drawable/back" />
 
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:text="@string/view_resume"
-            android:textColor="@android:color/white"
-            android:textSize="18sp"
+            android:textColor="#432676"
+            android:textSize="20sp"
             android:textStyle="bold" />
     </RelativeLayout>
+
 
     <androidx.cardview.widget.CardView
         android:id="@+id/resumePaper"
@@ -47,9 +51,12 @@
         app:layout_constraintTop_toBottomOf="@id/topBar"
         app:layout_constraintVertical_bias="0.482">
 
+
         <include layout="@layout/resume_content_minimal" />
 
+
     </androidx.cardview.widget.CardView>
+
 
     <Button
         android:id="@+id/downloadBtn"
@@ -57,7 +64,7 @@
         android:layout_height="52dp"
         android:layout_marginBottom="96dp"
         android:background="@drawable/gradient_button_rounded"
-        app:backgroundTint="#502677"
+        app:backgroundTint="#50387C"
         android:text="@string/btn_download"
         android:textAllCaps="false"
         android:textColor="@android:color/white"
@@ -67,16 +74,18 @@
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent" />
 
+
     <LinearLayout
         android:id="@+id/bottomToolbar"
         android:layout_width="match_parent"
         android:layout_height="65dp"
-        android:background="@android:color/white"
+        android:background="@drawable/glass_card"
         android:elevation="12dp"
         android:gravity="center"
         android:orientation="horizontal"
         android:padding="8dp"
         app:layout_constraintBottom_toBottomOf="parent">
+
 
         <ImageButton
             android:id="@+id/btnEdit"
@@ -86,7 +95,8 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/edit_profile"
             android:src="@android:drawable/ic_menu_edit"
-            app:tint="#444444" />
+            app:tint="#432676" />
+
 
         <ImageButton
             android:id="@+id/btnTextSize"
@@ -96,7 +106,8 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/desc_edit_sections"
             android:src="@android:drawable/ic_menu_sort_alphabetically"
-            app:tint="#444444" />
+            app:tint="#432676" />
+
 
         <ImageButton
             android:id="@+id/btnZoom"
@@ -106,7 +117,8 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/view"
             android:src="@android:drawable/ic_menu_search"
-            app:tint="#444444" />
+            app:tint="#432676" />
+
 
         <ImageButton
             android:id="@+id/btnShare"
@@ -116,8 +128,11 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/view_resume"
             android:src="@android:drawable/ic_menu_share"
-            app:tint="#444444" />
+            app:tint="#432676" />
+
 
     </LinearLayout>
 
+
 </androidx.constraintlayout.widget.ConstraintLayout>
+

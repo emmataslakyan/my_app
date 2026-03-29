@@ -7,6 +7,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/glass_card">
 
+
     <!-- ══════════════════════════════════════════════
          HEADER
          ══════════════════════════════════════════════ -->
@@ -24,6 +25,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+
         <!--  ★ GRADIENT TARGET: dashboardTitle  -->
         <TextView
             android:id="@+id/dashboard_title"
@@ -37,6 +39,7 @@
             android:textSize="50sp"
             android:textStyle="bold" />
 
+
         <ImageView
             android:id="@+id/btn_language_menu"
             android:layout_width="50dp"
@@ -46,7 +49,9 @@
             android:src="@drawable/language"
             app:tint="#2A0F51" />
 
+
     </LinearLayout>
+
 
     <!-- ══════════════════════════════════════════════
          MAIN SCROLL BODY
@@ -61,6 +66,7 @@
         app:layout_constraintTop_toBottomOf="@id/header_bar"
         app:layout_constraintBottom_toBottomOf="parent">
 
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -69,6 +75,7 @@
             android:paddingTop="4dp"
             android:paddingEnd="20dp"
             android:paddingBottom="32dp">
+
 
             <!--  ★ GRADIENT TARGET: continueLabel  -->
             <TextView
@@ -81,6 +88,7 @@
                 android:textColor="#051256"
                 android:textSize="14sp"
                 android:textStyle="bold" />
+
 
             <!-- ════════════════════════════════════════
                  HERO RESUME CARD (glass)
@@ -100,18 +108,22 @@
                 app:cardElevation="0dp"
                 tools:visibility="visible">
 
+
                 <LinearLayout
+
 
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="horizontal"
                     android:padding="18dp">
 
+
                     <!-- Resume thumbnail -->
                     <LinearLayout
                         android:layout_width="90dp"
                         android:layout_height="118dp"
                         android:background="@drawable/glass_card"
+
 
                         android:gravity="top|center_horizontal"
                         android:orientation="vertical"
@@ -120,11 +132,13 @@
                         android:paddingEnd="8dp"
                         android:paddingBottom="8dp">
 
+
                         <View
                             android:layout_width="31dp"
                             android:layout_height="31dp"
                             android:background="@drawable/profile2"
                             android:backgroundTint="#A096B8" />
+
 
                         <View
                             android:layout_width="match_parent"
@@ -132,11 +146,6 @@
                             android:layout_marginTop="8dp"
                             android:background="#D6C8EF" />
 
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="2dp"
-                            android:layout_marginTop="4dp"
-                            android:background="#D5CEEF" />
 
                         <View
                             android:layout_width="match_parent"
@@ -144,17 +153,27 @@
                             android:layout_marginTop="4dp"
                             android:background="#D5CEEF" />
 
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="2dp"
-                            android:layout_marginTop="4dp"
-                            android:background="#D5CEEF" />
 
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="2dp"
                             android:layout_marginTop="4dp"
                             android:background="#D5CEEF" />
+
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="2dp"
+                            android:layout_marginTop="4dp"
+                            android:background="#D5CEEF" />
+
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="2dp"
+                            android:layout_marginTop="4dp"
+                            android:background="#D5CEEF" />
+
 
                         <View
                             android:layout_width="26dp"
@@ -163,6 +182,7 @@
                             android:background="#E4E0F5" />
                     </LinearLayout>
 
+
                     <!-- Info column -->
                     <LinearLayout
                         android:layout_width="0dp"
@@ -170,6 +190,7 @@
                         android:layout_marginStart="16dp"
                         android:layout_weight="1"
                         android:orientation="vertical">
+
 
                         <!--  ★ GRADIENT TARGET: resumeCardTitle  -->
                         <TextView
@@ -182,6 +203,7 @@
                             android:textStyle="bold"
                             tools:text="Active Resume draft" />
 
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -189,6 +211,7 @@
                             android:text="Active draft"
                             android:textColor="#120F0F"
                             android:textSize="11sp" />
+
 
                         <TextView
                             android:id="@+id/resume_card_days"
@@ -198,6 +221,7 @@
                             android:textColor="#000000"
                             android:textSize="11sp"
                             tools:text="Progress – 12 days" />
+
 
                         <ProgressBar
                             android:id="@+id/resume_progress_bar"
@@ -210,6 +234,7 @@
                             android:progress="40"
                             android:progressBackgroundTint="#DDD6F0"
                             android:progressTint="#46287A" />
+
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btn_view_resume"
@@ -228,6 +253,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+
             <!-- Empty state spacer -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/no_resume_state"
@@ -239,6 +265,7 @@
                 app:cardBackgroundColor="@android:color/transparent"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp" />
+
 
             <!-- ════════════════════════════════════════
                  SPARK ASSISTANT PILL
@@ -258,11 +285,13 @@
                 android:paddingStart="22dp"
                 android:paddingEnd="22dp">
 
+
                 <LinearLayout
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:background="@drawable/s"
                     android:gravity="center">
+
 
                     <ImageView
                         android:layout_width="30dp"
@@ -271,6 +300,7 @@
                         android:src="@drawable/ai"
                         app:tint="#FFFFFF" />
                 </LinearLayout>
+
 
                 <!--  ★ GRADIENT TARGET: sparkAssistantText  -->
                 <TextView
@@ -285,6 +315,7 @@
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -293,6 +324,7 @@
                     android:textColor="#BBA8DE"
                     android:textSize="30sp" />
             </LinearLayout>
+
 
             <!-- ════════════════════════════════════════
                  RESUME BUILDER ROW
@@ -308,6 +340,7 @@
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp">
 
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="74dp"
@@ -316,13 +349,16 @@
                     android:orientation="horizontal"
                     android:padding="18dp">
 
+
                     <ImageView
                         android:layout_width="40dp"
                         android:layout_height="50dp"
 
+
                         android:contentDescription="Resume Builder Icon"
                         android:src="@drawable/resume"
                         app:tint="#46287A" />
+
 
                     <TextView
                         android:layout_width="0dp"
@@ -334,7 +370,9 @@
                         android:textColor="#2C1153"
                         android:textSize="20sp"
 
+
                         android:textStyle="bold" />
+
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -345,6 +383,7 @@
                         android:textSize="22sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/opp_section"
@@ -357,6 +396,7 @@
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp">
 
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="74dp"
@@ -365,15 +405,20 @@
                     android:orientation="horizontal"
                     android:padding="18dp">
 
+
                     <ImageView
                         android:layout_width="40dp"
                         android:layout_height="50dp"
+
 
                         android:contentDescription="Resume Builder Icon"
                         android:src="@drawable/opp"
                         app:tint="#46287A" />
 
+
+                    <!--  ★ GRADIENT TARGET: discoverLabel  -->
                     <TextView
+                        android:id="@+id/discoverLabel"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="14dp"
@@ -382,8 +427,8 @@
                         android:text="@string/discover_opps"
                         android:textColor="#2C1153"
                         android:textSize="20sp"
-
                         android:textStyle="bold" />
+
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -408,17 +453,19 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <!--  ★ GRADIENT TARGET: discoverLabel  -->
+
+                <!--  ★ GRADIENT TARGET: pdfToolsLabel  -->
                 <TextView
-                    android:id="@+id/discoverLabel"
+                    android:id="@+id/pdf_tools_label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:fontFamily="sans-serif-medium"
                     android:text="@string/pdf_tools"
                     android:textColor="#051256"
-                    android:textSize="15sp"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
+
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -428,6 +475,7 @@
                     android:textColor="#46287A"
                     android:textSize="22sp" />
             </LinearLayout>
+
 
             <!-- ════════════════════════════════════════
                  DISCOVERY GRID — 3 glass tiles
@@ -439,6 +487,7 @@
                 android:baselineAligned="false"
                 android:orientation="horizontal"
                 android:weightSum="3">
+
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/tile_peer"
@@ -453,13 +502,16 @@
                     app:cardCornerRadius="16dp"
                     app:cardElevation="0dp">
 
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:gravity="center"
                         android:orientation="vertical"
 
+
                         android:padding="8dp">
+
 
                         <ImageView
                             android:layout_width="25dp"
@@ -467,8 +519,10 @@
                             android:contentDescription="Peer Advisory"
                             android:background="@drawable/glass_card"
 
+
                             android:src="@drawable/merge"
                             app:tint="#46287A" />
+
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -480,6 +534,7 @@
                             android:textSize="11sp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
+
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/tile_split"
@@ -496,13 +551,16 @@
                     app:cardCornerRadius="16dp"
                     app:cardElevation="0dp">
 
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:gravity="center"
 
+
                         android:orientation="vertical"
                         android:padding="8dp">
+
 
                         <ImageView
                             android:layout_width="24dp"
@@ -511,6 +569,7 @@
                             android:src="@drawable/split"
                             android:background="@drawable/glass_card"
                             app:tint="#46287A" />
+
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -522,6 +581,7 @@
                             android:textSize="11sp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
+
 
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/tile_compress"
@@ -537,12 +597,14 @@
                     app:cardCornerRadius="16dp"
                     app:cardElevation="0dp">
 
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:gravity="center"
                         android:orientation="vertical"
                         android:padding="8dp">
+
 
                         <ImageView
                             android:layout_width="27dp"
@@ -551,6 +613,7 @@
                             android:src="@drawable/compress"
                             android:background="@drawable/glass_card"
                             app:tint="#46287A" />
+
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -563,9 +626,15 @@
                     </LinearLayout>
 
 
+
+
                 </com.google.android.material.card.MaterialCardView>
 
+
             </LinearLayout>
+
+
+
 
 
 
@@ -586,12 +655,14 @@
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp">
 
+
                 <LinearLayout
                     android:layout_width="361dp"
                     android:layout_height="74dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:padding="16dp">
+
 
                     <com.google.android.material.imageview.ShapeableImageView
                         android:layout_width="38dp"
@@ -601,12 +672,14 @@
                         android:tint="#290F4D"
                         app:shapeAppearanceOverlay="@style/CircleImage" />
 
+
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:layout_weight="1"
                         android:orientation="vertical">
+
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -617,6 +690,7 @@
                             android:textSize="20sp"
                             android:textStyle="bold" />
 
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -624,6 +698,7 @@
                             android:textColor="#757575"
                             android:textSize="12sp" />
                     </LinearLayout>
+
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -636,7 +711,10 @@
             </com.google.android.material.card.MaterialCardView>
 
 
+
+
         </LinearLayout>
     </ScrollView>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

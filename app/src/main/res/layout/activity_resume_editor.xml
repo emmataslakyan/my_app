@@ -5,13 +5,15 @@
     android:layout_height="match_parent"
     android:background="@drawable/glass_card">
 
+
     <!-- Header -->
     <RelativeLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:background="@drawable/header_gradient"
+        android:background="@drawable/glass_card"
         android:elevation="4dp">
+
 
         <ImageButton
             android:id="@+id/backBtn"
@@ -23,15 +25,17 @@
             android:contentDescription="@string/desc_back"
             android:foreground="@drawable/back" />
 
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:text="@string/my_profile"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp"
+            android:textColor="#431772"
+            android:textSize="22sp"
             android:textStyle="bold" />
     </RelativeLayout>
+
 
     <!-- Bottom Bar -->
     <LinearLayout
@@ -39,7 +43,7 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_alignParentBottom="true"
-        android:background="@drawable/header_gradient"
+        android:background="@drawable/glass_card"
         android:clickable="true"
         android:elevation="8dp"
         android:focusable="true"
@@ -47,12 +51,14 @@
         android:gravity="center"
         android:orientation="horizontal">
 
+
         <ImageView
             android:layout_width="22dp"
             android:layout_height="22dp"
             android:contentDescription="@string/view_resume"
             android:src="@android:drawable/ic_menu_view"
-            app:tint="#FFFFFF" />
+            app:tint="#48197B" />
+
 
         <TextView
             android:layout_width="wrap_content"
@@ -60,10 +66,11 @@
             android:layout_marginStart="10dp"
             android:letterSpacing="0.05"
             android:text="@string/view_resume"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
+            android:textColor="#35135E"
+            android:textSize="18sp"
             android:textStyle="bold" />
     </LinearLayout>
+
 
     <!-- Scrollable Content -->
     <ScrollView
@@ -73,11 +80,13 @@
         android:layout_below="@id/header"
         android:scrollbars="none">
 
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
+
 
             <!-- Section Header Row -->
             <LinearLayout
@@ -86,6 +95,7 @@
                 android:layout_marginBottom="12dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
+
 
                 <TextView
                     android:layout_width="0dp"
@@ -97,6 +107,7 @@
                     android:textSize="12sp"
                     android:textStyle="bold" />
 
+
                 <ImageButton
                     android:id="@+id/btnEditSectionNames"
                     android:layout_width="36dp"
@@ -107,8 +118,9 @@
                     app:tint="#6133B8" />
             </LinearLayout>
 
+
             <!-- Personal Details -->
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/btnPersonalDetails"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -116,9 +128,10 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="#FFFFFF"
+                android:background="@drawable/glass_card"
+                app:cardBackgroundColor="@android:color/transparent"
                 app:cardCornerRadius="10dp"
-                app:cardElevation="2dp">
+                app:cardElevation="0dp">
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -149,10 +162,11 @@
                         android:contentDescription="@string/desc_chevron"
                         android:src="@drawable/ic_chevron_right" />
                 </RelativeLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
+
 
             <!-- Education -->
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/btnEducation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -160,9 +174,10 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="#FFFFFF"
+                android:background="@drawable/glass_card"
+                app:cardBackgroundColor="@android:color/transparent"
                 app:cardCornerRadius="10dp"
-                app:cardElevation="2dp">
+                app:cardElevation="0dp">
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -193,10 +208,11 @@
                         android:contentDescription="@string/desc_chevron"
                         android:src="@drawable/ic_chevron_right" />
                 </RelativeLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
+
 
             <!-- Experience -->
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/btnExperience"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -204,9 +220,10 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="#FFFFFF"
+                android:background="@drawable/glass_card"
+                app:cardBackgroundColor="@android:color/transparent"
                 app:cardCornerRadius="10dp"
-                app:cardElevation="2dp">
+                app:cardElevation="0dp">
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -237,10 +254,11 @@
                         android:contentDescription="@string/desc_chevron"
                         android:src="@drawable/ic_chevron_right" />
                 </RelativeLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
+
 
             <!-- Skills -->
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/btnSkills"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -248,9 +266,10 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="#FFFFFF"
+                android:background="@drawable/glass_card"
+                app:cardBackgroundColor="@android:color/transparent"
                 app:cardCornerRadius="10dp"
-                app:cardElevation="2dp">
+                app:cardElevation="0dp">
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -281,10 +300,11 @@
                         android:contentDescription="@string/desc_chevron"
                         android:src="@drawable/ic_chevron_right" />
                 </RelativeLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
+
 
             <!-- Volunteering -->
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/btnVolunteering"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -292,9 +312,10 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="#FFFFFF"
+                android:background="@drawable/glass_card"
+                app:cardBackgroundColor="@android:color/transparent"
                 app:cardCornerRadius="10dp"
-                app:cardElevation="2dp">
+                app:cardElevation="0dp">
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -325,10 +346,11 @@
                         android:contentDescription="@string/desc_chevron"
                         android:src="@drawable/ic_chevron_right" />
                 </RelativeLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
+
 
             <!-- Languages -->
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/btnLanguages"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -336,9 +358,10 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="#FFFFFF"
+                android:background="@drawable/glass_card"
+                app:cardBackgroundColor="@android:color/transparent"
                 app:cardCornerRadius="10dp"
-                app:cardElevation="2dp">
+                app:cardElevation="0dp">
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -369,10 +392,11 @@
                         android:contentDescription="@string/desc_chevron"
                         android:src="@drawable/ic_chevron_right" />
                 </RelativeLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
+
 
             <!-- Projects (optional) -->
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/btnProjects"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -381,9 +405,10 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="#FFFFFF"
+                android:background="@drawable/glass_card"
+                app:cardBackgroundColor="@android:color/transparent"
                 app:cardCornerRadius="10dp"
-                app:cardElevation="2dp">
+                app:cardElevation="0dp">
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -414,10 +439,11 @@
                         android:contentDescription="@string/desc_chevron"
                         android:src="@drawable/ic_chevron_right" />
                 </RelativeLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
+
 
             <!-- Honors & Awards (optional) -->
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/btnAwards"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -426,9 +452,10 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="#FFFFFF"
+                android:background="@drawable/glass_card"
+                app:cardBackgroundColor="@android:color/transparent"
                 app:cardCornerRadius="10dp"
-                app:cardElevation="2dp">
+                app:cardElevation="0dp">
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -459,7 +486,8 @@
                         android:contentDescription="@string/desc_chevron"
                         android:src="@drawable/ic_chevron_right" />
                 </RelativeLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
+
 
             <!-- Divider -->
             <View
@@ -469,42 +497,53 @@
                 android:layout_marginBottom="16dp"
                 android:background="#EFEFFD" />
 
+
             <!-- Add More Section -->
-            <androidx.cardview.widget.CardView
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/btnAddMore"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="32dp"
                 android:clickable="true"
                 android:focusable="true"
-                android:background="#E4E0E0"
-
+                android:background="@drawable/glass_card"
+                app:cardBackgroundColor="@android:color/transparent"
                 app:cardCornerRadius="10dp"
                 app:cardElevation="0dp">
+
+
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="59dp"
+                    android:background="@drawable/buttonn"
                     android:gravity="center"
                     android:orientation="horizontal"
                     android:padding="16dp">
+
+
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:contentDescription="@string/add_more_section"
                         android:src="@android:drawable/ic_input_add"
-                        app:tint="#6133B8" />
+                        app:tint="#EFF0FD" />
+
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
                         android:text="@string/add_more_section"
-                        android:textColor="#6133B8"
+                        android:textColor="#EFF0FD"
                         android:textSize="15sp"
                         android:textStyle="bold" />
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
+            </com.google.android.material.card.MaterialCardView>
+
 
         </LinearLayout>
     </ScrollView>
 
+
 </RelativeLayout>
+

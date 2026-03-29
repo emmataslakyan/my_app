@@ -45,8 +45,8 @@
             android:layout_marginBottom="0dp"
             android:scaleType="fitCenter"
             android:src="@drawable/icon_account_circle"
-            app:tint="#46186E"
-            app:strokeColor="#4B1F72"/>
+            app:tint="#381462"
+            app:strokeColor="#381462"/>
 
         <TextView
             android:id="@+id/login_title"
@@ -55,7 +55,7 @@
             android:layout_marginBottom="30dp"
             android:text="@string/login_header"
             android:textAlignment="center"
-            android:textColor="#051256"
+            android:textColor="#172264"
             android:textSize="38sp"
             android:textStyle="bold" />
 
@@ -88,7 +88,7 @@
             android:layout_width="316dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:backgroundTint="#46287A"
+            android:backgroundTint="#381462"
             android:text="@string/btn_login"
             android:textColor="@android:color/white"
             app:cornerRadius="12dp" />
@@ -101,7 +101,7 @@
             android:clickable="true"
             android:focusable="true"
             android:text="@string/forgot_password"
-            android:textColor="#500CCE"
+            android:textColor="#432676"
             android:textSize="14sp"
             android:textStyle="bold" />
 

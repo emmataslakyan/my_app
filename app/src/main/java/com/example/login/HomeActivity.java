@@ -1,122 +1,234 @@
 package com.example.login;
 
+
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.os.LocaleListCompat;
+
+
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.firebase.auth.FirebaseAuth;
 
+
 public class HomeActivity extends BaseActivity {
 
-    private MaterialCardView profileSection, resumeSection, oppSection;
-    private MaterialCardView resumeCard, noResumeState;
-    private LinearLayout aiSection, opportunitiesSection;
-    private ImageView btnLanguage;
+
+    // ── Navigation views ─────────────────────────
+    private ImageView        btnLanguageMenu;
+    private LinearLayout     aiSection;
+    private LinearLayout     opportunitiesSection;
+    private MaterialCardView resumeSection;
+    private MaterialCardView oppSection;
+    private MaterialCardView profileSection;
+    private MaterialCardView btnMergeLayout;
+    private MaterialCardView btnSplitLayout;
+    private MaterialCardView btnCompressLayout;
+
+
+    // ── Resume hero card ─────────────────────────
+    private MaterialCardView resumeCard;
+    private MaterialCardView noResumeState;
+    private MaterialButton   btnViewResume;
+    private TextView         resumeCardTitle;
+    private TextView         resumeCardDays;
+    private ProgressBar      resumeProgressBar;
+
+
+    // ── Gradient TextViews ───────────────────────
+    private TextView dashboardTitle;
+    private TextView continueLabel;
+    private TextView sparkAssistantText;
+    private TextView discoverLabel;
+    private TextView pdfToolsLabel;
+
+
     private FirebaseAuth mAuth;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+
         mAuth = FirebaseAuth.getInstance();
 
-        // 1. Session Safety Check
+
         if (mAuth.getCurrentUser() == null) {
             startActivity(new Intent(this, MainActivity.class));
             finish();
             return;
         }
 
-        // 2. Initialize All Views
-        btnLanguage          = findViewById(R.id.btn_language_menu);
-        profileSection       = findViewById(R.id.profile_section);
-        resumeSection        = findViewById(R.id.resume_section);
-        oppSection           = findViewById(R.id.opp_section);
-        aiSection            = findViewById(R.id.ai_section);
-        opportunitiesSection = findViewById(R.id.opportunities_section);
-        resumeCard           = findViewById(R.id.resume_card);
-        noResumeState        = findViewById(R.id.no_resume_state);
 
-        // 3. Show "Continue Building" card
-        // Replace `true` with a real check if you have resume data
-        boolean hasResume = true;
-        if (resumeCard != null) {
-            resumeCard.setVisibility(hasResume ? View.VISIBLE : View.GONE);
-        }
-        if (noResumeState != null) {
-            noResumeState.setVisibility(hasResume ? View.GONE : View.VISIBLE);
-        }
-
-        // 4. Set up all button actions
+        bindViews();
+        applyGradients();
+        loadResumeState();
         setupDashboardActions();
     }
 
-    private void setupDashboardActions() {
 
-        // --- Language Button ---
-        if (btnLanguage != null) {
-            btnLanguage.setOnClickListener(v -> showLanguageDialog());
-        }
+    private void bindViews() {
+        // Gradient TextViews
+        dashboardTitle     = findViewById(R.id.dashboard_title);
+        continueLabel      = findViewById(R.id.continueLabel);
+        sparkAssistantText = findViewById(R.id.sparkAssistantText);
+        discoverLabel      = findViewById(R.id.discoverLabel);
+        pdfToolsLabel      = findViewById(R.id.pdf_tools_label);
 
-        // --- Spark AI Assistant ---
-        if (aiSection != null) {
-            aiSection.setOnClickListener(v ->
-                    startActivity(new Intent(HomeActivity.this, AiAssistantActivity.class)));
-        }
 
-        // --- Profile Section ---
-        if (profileSection != null) {
-            profileSection.setOnClickListener(v ->
-                    startActivity(new Intent(this, ProfileActivity.class)));
-        }
+        // Navigation Containers
+        btnLanguageMenu      = findViewById(R.id.btn_language_menu);
+        aiSection            = findViewById(R.id.ai_section);
+        resumeSection        = findViewById(R.id.resume_section);
+        oppSection           = findViewById(R.id.opp_section);
+        opportunitiesSection = findViewById(R.id.opportunities_section);
+        profileSection       = findViewById(R.id.profile_section);
 
-        // --- Resume Builder ---
-        if (resumeSection != null) {
-            resumeSection.setOnClickListener(v ->
-                    startActivity(new Intent(this, MyResumesActivity.class)));
-        }
+        // PDF Tool Tiles
+        btnMergeLayout       = findViewById(R.id.tile_peer);
+        btnSplitLayout       = findViewById(R.id.tile_split);
+        btnCompressLayout    = findViewById(R.id.tile_compress);
 
-        // --- Opportunities Card ---
-        if (oppSection != null) {
-            oppSection.setOnClickListener(v ->
-                    startActivity(new Intent(this, OpportunitiesActivity.class)));
-        }
 
-        // --- Opportunities Row (text link at bottom) ---
-        if (opportunitiesSection != null) {
-            opportunitiesSection.setOnClickListener(v ->
-                    startActivity(new Intent(this, OpportunitiesActivity.class)));
-        }
+        // Resume hero card
+        resumeCard        = findViewById(R.id.resume_card);
+        noResumeState     = findViewById(R.id.no_resume_state);
+        btnViewResume     = findViewById(R.id.btn_view_resume);
+        resumeCardTitle   = findViewById(R.id.resume_card_title);
+        resumeCardDays    = findViewById(R.id.resume_card_days);
+        resumeProgressBar = findViewById(R.id.resume_progress_bar);
+    }
 
-        // --- Resume Card (Continue Building) ---
-        if (resumeCard != null) {
-            resumeCard.setOnClickListener(v ->
-                    startActivity(new Intent(this, MyResumesActivity.class)));
+
+    private void applyGradients() {
+        if (dashboardTitle != null)
+            GradientTextUtils.applyGradient(dashboardTitle,
+                    Color.parseColor("#280F4F"),
+                    Color.parseColor("#46287A"),
+                    Color.parseColor("#9B5DFF"));
+
+
+        if (continueLabel != null)
+            GradientTextUtils.applyGradient(continueLabel,
+                    Color.parseColor("#051256"),
+                    Color.parseColor("#46287A"));
+
+
+        if (sparkAssistantText != null)
+            GradientTextUtils.applyGradient(sparkAssistantText,
+                    Color.parseColor("#FFFFFF"),
+                    Color.parseColor("#BBA8DE"));
+
+
+//        if (discoverLabel != null)
+//            GradientTextUtils.applyGradient(discoverLabel,
+//                    Color.parseColor("#051256"),
+//                    Color.parseColor("#7B2FF7"));
+
+
+        if (pdfToolsLabel != null)
+            GradientTextUtils.applyGradient(pdfToolsLabel,
+                    Color.parseColor("#46287A"),
+                    Color.parseColor("#9B5DFF"));
+    }
+
+
+    private void loadResumeState() {
+        if (resumeCard == null || noResumeState == null) return;
+
+
+        boolean hasDraft = true; // Placeholder for logic
+
+
+        if (hasDraft) {
+            resumeCard.setVisibility(View.VISIBLE);
+            noResumeState.setVisibility(View.GONE);
+
+
+            if (resumeCardTitle != null) {
+                resumeCardTitle.setText("Active Resume Draft");
+                GradientTextUtils.applyGradient(resumeCardTitle,
+                        Color.parseColor("#280F4F"),
+                        Color.parseColor("#46287A"));
+            }
+        } else {
+            resumeCard.setVisibility(View.GONE);
+            noResumeState.setVisibility(View.VISIBLE);
         }
     }
+
+
+    private void setupDashboardActions() {
+        if (btnLanguageMenu != null)
+            btnLanguageMenu.setOnClickListener(v -> showLanguageDialog());
+
+
+        if (aiSection != null)
+            aiSection.setOnClickListener(v ->
+                    startActivity(new Intent(this, AiAssistantActivity.class)));
+
+
+        if (resumeSection != null)
+            resumeSection.setOnClickListener(v ->
+                    startActivity(new Intent(this, MyResumesActivity.class)));
+
+
+        if (oppSection != null)
+            oppSection.setOnClickListener(v ->
+                    startActivity(new Intent(this, OpportunitiesActivity.class)));
+
+
+        if (btnViewResume != null)
+            btnViewResume.setOnClickListener(v ->
+                    startActivity(new Intent(this, MyResumesActivity.class)));
+
+
+        if (profileSection != null)
+            profileSection.setOnClickListener(v ->
+                    startActivity(new Intent(this, ProfileActivity.class)));
+
+
+        if (btnMergeLayout != null)
+            btnMergeLayout.setOnClickListener(v ->
+                    startActivity(new Intent(this, MergePdfActivity.class)));
+
+
+        if (btnSplitLayout != null)
+            btnSplitLayout.setOnClickListener(v ->
+                    startActivity(new Intent(this, SplitPdfActivity.class)));
+
+
+        if (btnCompressLayout != null)
+            btnCompressLayout.setOnClickListener(v ->
+                    startActivity(new Intent(this, CompressPdfActivity.class)));
+    }
+
 
     private void showLanguageDialog() {
         String[] languages = {"English", "Русский"};
         new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.select_language))
-                .setItems(languages, (dialog, which) -> {
-                    if (which == 0) {
-                        setAppLocale("en");
-                    } else {
-                        setAppLocale("ru");
-                    }
-                })
+                .setItems(languages, (dialog, which) ->
+                        setAppLocale(which == 0 ? "en" : "ru"))
                 .show();
     }
+
 
     private void setAppLocale(String languageCode) {
         LocaleListCompat appLocale = LocaleListCompat.forLanguageTags(languageCode);
         AppCompatDelegate.setApplicationLocales(appLocale);
     }
 }
+

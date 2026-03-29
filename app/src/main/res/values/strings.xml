@@ -37,12 +37,17 @@
     <string name="main_tools">Main Tools</string>
     <string name="spark_assistant">Spark Assistant</string>
     <string name="resume_builder">Resume Builder</string>
+    <string name="continue_building">Continue Building</string>
     <string name="discover_opps">Discover Opportunities</string>
+
+    <!-- PDF Tools -->
     <string name="pdf_tools">PDF Tools</string>
     <string name="btn_merge">Merge</string>
     <string name="btn_split">Split</string>
     <string name="btn_compress">Compress</string>
     <string name="btn_img_to_pdf">Img to PDF</string>
+
+
 
     <!-- Section labels (editor list) -->
     <string name="sections_header">SECTIONS</string>

@@ -10,7 +10,8 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:hint="• Add Description..."
-        android:background="@android:drawable/editbox_background_normal"/>
+        android:background="@android:drawable/editbox_background_normal"
+        android:backgroundTint="@android:color/transparent"/>
 
     <ImageButton
         android:id="@+id/btnDeleteBullet"

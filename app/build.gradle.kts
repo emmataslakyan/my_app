@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -18,8 +20,20 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "SUPABASE_URL", "\"https://your-project.supabase.co\"")
-        buildConfigField("String", "SUPABASE_ANON_KEY", "\"your-anon-key\"")
+        val properties = Properties()
+        val localPropertiesFile = project.rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            properties.load(localPropertiesFile.inputStream())
+        }
+
+        // All 3 keys read from local.properties — safe for GitHub
+        val openRouterKey = properties.getProperty("OPENROUTER_API_KEY") ?: ""
+        val supabaseUrl = properties.getProperty("SUPABASE_URL") ?: ""
+        val supabaseAnonKey = properties.getProperty("SUPABASE_ANON_KEY") ?: ""
+
+        buildConfigField("String", "OPENROUTER_API_KEY", "\"$openRouterKey\"")
+        buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
+        buildConfigField("String", "SUPABASE_ANON_KEY", "\"$supabaseAnonKey\"")
 
         javaCompileOptions {
             annotationProcessorOptions {
@@ -46,25 +60,37 @@ android {
     }
 
     buildFeatures {
-        buildConfig = true
+        buildConfig = true // Required to use BuildConfig.OPENROUTER_API_KEY
     }
 }
 
 dependencies {
+    // Core & UI
     implementation(libs.activity)
     implementation(libs.cardview)
     implementation(libs.coordinatorlayout)
-    val roomVersion = "2.6.1"
+    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("com.google.android.material:material:1.12.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.2.0")
 
-    // Room
+    // Room Database
+    val roomVersion = "2.6.1"
     implementation("androidx.room:room-runtime:$roomVersion")
     kapt("androidx.room:room-compiler:$roomVersion")
 
+    implementation("org.jsoup:jsoup:1.18.1")
 
-    // Firebase
+    // Firebase (Auth, Firestore, Vertex AI)
     implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-vertexai:16.0.0-beta01")
+
+    // AI & Networking
+    implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("com.google.guava:guava:31.1-android")
 
     // Auth & Identity
     implementation("com.google.android.gms:play-services-auth:21.2.0")
@@ -72,30 +98,11 @@ dependencies {
     implementation("androidx.credentials:credentials-play-services-auth:1.3.0")
     implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
 
-    // UI & Core
-    implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("com.google.android.material:material:1.12.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.2.0")
+    // Utilities
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
     // Testing
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-
-    implementation("com.google.firebase:firebase-vertexai:16.0.0-beta01")
-
-    implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
-
-    // 2. Guava for the ListenableFuture callback handling
-    implementation("com.google.guava:guava:31.1-android")
-    implementation("com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava")
-
-    // 3. UI
-    implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("com.google.android.material:material:1.12.0")
-    // Add this for API calls
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    // Add this to handle JSON data easily
-    implementation("com.google.code.gson:gson:2.10.1")
 }

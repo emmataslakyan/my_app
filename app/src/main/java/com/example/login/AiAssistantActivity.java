@@ -22,9 +22,11 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 /**
  * AI Assistant using OpenRouter API (OpenAI Compatible)
+ * API key is stored in local.properties and injected via BuildConfig — safe for GitHub.
  */
 public class AiAssistantActivity extends BaseActivity {
 
@@ -36,19 +38,11 @@ public class AiAssistantActivity extends BaseActivity {
     private final OkHttpClient client = new OkHttpClient();
 
     // --- OPENROUTER CONFIG ---
-    private final String OPENROUTER_API_KEY = "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";
-    private final String API_URL = "https://openrouter.ai/api/v1/chat/completions";
+    // Key is read from local.properties via BuildConfig — never hardcoded
+    private final String OPENROUTER_API_KEY = BuildConfig.OPENROUTER_API_KEY;
+    private static final String API_URL = "https://openrouter.ai/api/v1/chat/completions";
+    private static final String MODEL_ID = "google/gemini-2.0-flash-001";
 
-    // Use a :free model for testing, or "meta-llama/llama-3.3-70b-instruct" for high quality
-
-    // Option A: Fast and extremely cheap (Current best for testing)
-    private final String MODEL_ID = "google/gemini-2.0-flash-001";
-
-// Option B: Completely Free (if available)
-// private final String MODEL_ID = "google/gemini-2.0-pro-exp-02-05:free";
-
-    // Option C: High-quality Llama model
-// private final String MODEL_ID = "meta-llama/llama-3.3-70b-instruct";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,7 +62,7 @@ public class AiAssistantActivity extends BaseActivity {
             String text = etMessage.getText().toString().trim();
             if (!text.isEmpty()) {
                 sendToAi(text);
-                etMessage.setText(""); // Clear input
+                etMessage.setText("");
             }
         });
 
@@ -90,38 +84,28 @@ public class AiAssistantActivity extends BaseActivity {
             jsonRequest.put("model", MODEL_ID);
 
             JSONArray messages = new JSONArray();
-            messages.put(new JSONObject().put("role", "system").put("content", "You are the SkillSpark Career Mentor, an expert AI counselor dedicated to helping students and early-career professionals transform their raw experiences into high-impact resumes. Your goal is to be a supportive, detail-oriented, and strategic collaborator.\n" +
-                    "\n" +
-                    "Core Objectives:\n" +
-                    "\n" +
-                    "AI-Guided Writing: Help users phrase their achievements using the STAR method (Situation, Task, Action, Result). If a user provides a weak description like \"I helped with a project,\" prompt them for specific metrics or tools used.\n" +
-                    "\n" +
-                    "Spelling & Grammar: Silently correct minor errors, but provide \"Smart Feedback\" for significant stylistic improvements to ensure the tone remains professional.\n" +
-                    "\n" +
-                    "Strategic Gap Filling: Identify \"empty\" sections of a resume and suggest specific types of National or International programs, competitions, or volunteering opportunities that would strengthen that specific user’s profile.\n" +
-                    "\n" +
-                    "Opportunity Matching: Based on the skills the user enters (e.g., \"Python\" or \"Graphic Design\"), suggest relevant areas for growth, such as Hackathons, NGO volunteering, or specialized certifications.\n" +
-                    "\n" +
-                    "Tone and Style:\n" +
-                    "\n" +
-                    "Empathetic but Candid: Validate the user's current skills while being direct about what needs improvement.\n" +
-                    "\n" +
-                    "Concise & Scannable: Use bullet points and bold text to make your advice easy to digest.\n" +
-                    "\n" +
-                    "Interactive: Always end your response with a clear next step or a thought-provoking question (e.g., \"What was the most challenging part of this project?\").\n" +
-                    "\n" +
-                    "Adaptive: Mirror the user's level of experience. If they are a high schooler, use accessible language; if they are a senior tech student, use industry-standard terminology.\n" +
-                    "\n" +
-                    "Response Constraints:\n" +
-                    "\n" +
-                    "Do not just rewrite the text; explain why the change makes the resume better.\n" +
-                    "\n" +
-                    "Focus on \"Action Verbs\" (e.g., Developed, Orchestrated, Optimized).\n" +
-                    "\n" +
-                    "Avoid corporate jargon that obscures actual meaning."));
+
+            String systemPrompt = "You are the SkillSpark Career Mentor, an expert AI counselor dedicated to helping students and early-career professionals transform their raw experiences into high-impact resumes. Your goal is to be a supportive, detail-oriented, and strategic collaborator.\n\n" +
+                    "Core Objectives:\n\n" +
+                    "AI-Guided Writing: Help users phrase their achievements using the STAR method (Situation, Task, Action, Result). If a user provides a weak description like \"I helped with a project,\" prompt them for specific metrics or tools used.\n\n" +
+                    "Spelling & Grammar: Silently correct minor errors, but provide \"Smart Feedback\" for significant stylistic improvements to ensure the tone remains professional.\n\n" +
+                    "Strategic Gap Filling: Identify \"empty\" sections of a resume and suggest specific types of National or International programs, competitions, or volunteering opportunities that would strengthen that specific user's profile.\n\n" +
+                    "Opportunity Matching: Based on the skills the user enters (e.g., \"Python\" or \"Graphic Design\"), suggest relevant areas for growth, such as Hackathons, NGO volunteering, or specialized certifications.\n\n" +
+                    "Tone and Style:\n\n" +
+                    "Empathetic but Candid: Validate the user's current skills while being direct about what needs improvement.\n\n" +
+                    "Concise & Scannable: Use bullet points and bold text to make your advice easy to digest.\n\n" +
+                    "Interactive: Always end your response with a clear next step or a thought-provoking question (e.g., \"What was the most challenging part of this project?\").\n\n" +
+                    "Adaptive: Mirror the user's level of experience. If they are a high schooler, use accessible language; if they are a senior tech student, use industry-standard terminology.\n\n" +
+                    "Response Constraints:\n\n" +
+                    "Do not just rewrite the text; explain why the change makes the resume better.\n\n" +
+                    "Focus on \"Action Verbs\" (e.g., Developed, Orchestrated, Optimized).\n\n" +
+                    "Avoid corporate jargon that obscures actual meaning.";
+
+            messages.put(new JSONObject().put("role", "system").put("content", systemPrompt));
             messages.put(new JSONObject().put("role", "user").put("content", userText));
 
             jsonRequest.put("messages", messages);
+
         } catch (Exception e) {
             Log.e("AI_DEBUG", "JSON Build Error", e);
         }
@@ -131,11 +115,10 @@ public class AiAssistantActivity extends BaseActivity {
                 MediaType.get("application/json; charset=utf-8")
         );
 
-        // Build HTTP Request
         Request request = new Request.Builder()
                 .url(API_URL)
                 .header("Authorization", "Bearer " + OPENROUTER_API_KEY)
-                .header("HTTP-Referer", "https://com.example.login") // Required for some models
+                .header("HTTP-Referer", "https://com.example.login")
                 .header("X-Title", "Career Coach Android App")
                 .post(body)
                 .build();
@@ -151,7 +134,18 @@ public class AiAssistantActivity extends BaseActivity {
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                String rawResponse = response.body().string();
+                // Null-safe body read
+                ResponseBody responseBody = response.body();
+                if (responseBody == null) {
+                    runOnUiThread(() -> {
+                        removePlaceholder(typingPlaceholder);
+                        addMessage("Received an empty response from the server.", Message.SENT_BY_BOT);
+                    });
+                    return;
+                }
+
+                String rawResponse = responseBody.string();
+
                 if (response.isSuccessful()) {
                     try {
                         JSONObject json = new JSONObject(rawResponse);
@@ -164,6 +158,7 @@ public class AiAssistantActivity extends BaseActivity {
                             removePlaceholder(typingPlaceholder);
                             addMessage(aiReply, Message.SENT_BY_BOT);
                         });
+
                     } catch (Exception e) {
                         Log.e("AI_DEBUG", "Parse Error: " + rawResponse);
                         runOnUiThread(() -> {
