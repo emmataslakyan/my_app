@@ -47,8 +47,6 @@
     <string name="btn_compress">Compress</string>
     <string name="btn_img_to_pdf">Img to PDF</string>
 
-
-
     <!-- Section labels (editor list) -->
     <string name="sections_header">SECTIONS</string>
     <string name="personal_details">Personal Details</string>
@@ -99,5 +97,36 @@
 
     <string name="btn_download">Download</string>
     <string name="title_template">Template</string>
+
+    <!-- Education Activity — toolbar -->
+    <string name="title_education">Education</string>
+    <string name="cd_back">Go back</string>
+    <string name="cd_education_hint">Education tips</string>
+
+    <!-- Education Activity — section labels -->
+    <string name="label_school">School / University</string>
+    <string name="label_location">Location</string>
+    <string name="label_degree">Curriculum Description / Degree</string>
+    <string name="label_dates">Month, Year</string>
+    <string name="label_activities">Activities and Roles</string>
+    <string name="subtitle_activities">List your GPA, clubs, awards, or relevant coursework.</string>
+
+    <!-- Education Activity — input hints -->
+    <string name="hint_school_name">School Name</string>
+    <string name="hint_school_location">Location (e.g. Yerevan, Armenia)</string>
+    <string name="hint_degree">Degree / Curriculum (e.g. specialized in STEM)</string>
+    <string name="hint_dates">Dates (e.g. Jan 2025 - Present)</string>
+
+    <!-- Education Activity — buttons -->
+    <string name="btn_add_bullet">+ Add More Bullet Points</string>
+    <string name="btn_save_details">Save Details</string>
+
+    <!-- Education Activity — toasts and errors -->
+    <string name="education_saved">Education saved!</string>
+    <string name="error_not_signed_in">Not signed in</string>
+    <string name="error_save_failed">Save failed: %1$s</string>
+
+    <!-- Education Activity — hints bottom sheet -->
+    <string name="education_hints">🎓 EDUCATION TIPS:\n\n• GPA: Only include if it is 3.5 or higher.\n• Relevant Coursework: List classes that match the job description.\n• Honors: Mention Dean\'s List, scholarships, or club leadership.\n• Study Abroad: If applicable, list the city and university.</string>
 
 </resources>

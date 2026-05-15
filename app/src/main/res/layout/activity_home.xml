@@ -268,7 +268,7 @@
 
 
             <!-- ════════════════════════════════════════
-                 SPARK ASSISTANT PILL
+                 SPARK ASSISTANT
                  ════════════════════════════════════════ -->
             <LinearLayout
                 android:id="@+id/ai_section"
@@ -467,13 +467,6 @@
                     android:textStyle="bold" />
 
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:includeFontPadding="false"
-                    android:text="›"
-                    android:textColor="#46287A"
-                    android:textSize="22sp" />
             </LinearLayout>
 
 

@@ -9,7 +9,7 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/header_gradient">
+        android:background="@drawable/glass_card">
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
@@ -25,7 +25,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="Skills"
-                android:textColor="@color/white"
+                android:textColor="#4F2676"
                 android:textSize="18sp"
                 android:textStyle="bold" />
             <ImageButton

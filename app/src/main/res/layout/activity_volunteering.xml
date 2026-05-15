@@ -9,7 +9,7 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/header_gradient"
+        android:background="@drawable/glass_card"
         app:elevation="0dp">
 
         <androidx.appcompat.widget.Toolbar
@@ -26,7 +26,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="Volunteering"
-                android:textColor="@color/white"
+                android:textColor="#673AB7"
                 android:textSize="18sp"
                 android:textStyle="bold" />
             <ImageButton

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <EditText
+        android:id="@+id/et_degree"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_marginBottom="12dp"
+        android:hint="Degree (e.g. Bachelor of Science)"
+        android:inputType="textCapWords"
+        android:textColor="#222222"
+        android:textSize="14sp" />
+
+    <EditText
+        android:id="@+id/et_school"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_marginBottom="12dp"
+        android:hint="School / University"
+        android:inputType="textCapWords"
+        android:textColor="#222222"
+        android:textSize="14sp" />
+
+    <EditText
+        android:id="@+id/et_field"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_marginBottom="12dp"
+        android:hint="Field of Study"
+        android:inputType="textCapWords"
+        android:textColor="#222222"
+        android:textSize="14sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="12dp">
+
+        <EditText
+            android:id="@+id/et_start"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:hint="Start year"
+            android:inputType="number"
+            android:textColor="#222222"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/et_end"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_weight="1"
+            android:hint="End year / Present"
+            android:inputType="textCapWords"
+            android:textColor="#222222"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/et_gpa"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:hint="GPA (optional)"
+        android:inputType="numberDecimal"
+        android:textColor="#222222"
+        android:textSize="14sp" />
+
+</LinearLayout>

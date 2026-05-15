@@ -21,9 +21,21 @@ public class ResumeEditorActivity extends BaseActivity {
 
         currentResumeId = getIntent().getIntExtra("RESUME_ID", -1);
 
-        // 1. Navigation Listeners (All sections)
+        // Sync the Firestore profile snapshot into SharedPreferences first,
+        // then set up the rest of the screen. This ensures that when the user
+        // opens Personal Details or Education, the fields are already pre-filled.
+        new UserProfileManager().applySnapshotToPrefs(this, currentResumeId, () ->
+                runOnUiThread(this::setupUI)
+        );
+    }
+
+    // ─── All UI setup moved here so it runs after the snapshot is ready ───────
+
+    private void setupUI() {
+        // Back button
         findViewById(R.id.backBtn).setOnClickListener(v -> finish());
 
+        // Section navigation
         findViewById(R.id.btnPersonalDetails).setOnClickListener(v -> openSection(PersonalDetailsActivity.class));
         findViewById(R.id.btnEducation).setOnClickListener(v -> openSection(EducationActivity.class));
         findViewById(R.id.btnExperience).setOnClickListener(v -> openSection(ExperienceActivity.class));
@@ -31,26 +43,31 @@ public class ResumeEditorActivity extends BaseActivity {
         findViewById(R.id.btnVolunteering).setOnClickListener(v -> openSection(VolunteeringActivity.class));
         findViewById(R.id.btnLanguages).setOnClickListener(v -> openSection(LanguagesActivity.class));
 
-        // Dynamic Sections
+        // Optional / dynamic sections
         findViewById(R.id.btnProjects).setOnClickListener(v -> openSection(ProjectsActivity.class));
         findViewById(R.id.btnAwards).setOnClickListener(v -> {
-            // If you have an AwardsActivity, open it here
+            // Uncomment when AwardsActivity is ready:
             // openSection(AwardsActivity.class);
         });
-        // Bottom Bar Listener to choose template
+
+        // Bottom bar → template picker
         findViewById(R.id.bottomBar).setOnClickListener(v -> {
             Intent intent = new Intent(this, TemplateSelectionActivity.class);
             intent.putExtra("RESUME_ID", currentResumeId);
             startActivity(intent);
         });
 
-        // Add More & Rename
+        // Add more sections
         findViewById(R.id.btnAddMore).setOnClickListener(v -> openSection(AddSectionActivity.class));
+
+        // Rename section names
         findViewById(R.id.btnEditSectionNames).setOnClickListener(v -> showRenameMenu(v));
 
+        // Load any previously saved custom section names
         loadCustomNames();
     }
 
+    // ─── Rename menu ──────────────────────────────────────────────────────────
 
     private void showRenameMenu(View anchor) {
         PopupMenu popup = new PopupMenu(this, anchor);
@@ -65,14 +82,14 @@ public class ResumeEditorActivity extends BaseActivity {
 
         popup.setOnMenuItemClickListener(item -> {
             String title = item.getTitle().toString();
-            if (title.contains("Personal")) showRenameDialog(findViewById(R.id.tvPersonalTitle), "name_personal");
-            else if (title.contains("Education")) showRenameDialog(findViewById(R.id.tvEducationTitle), "name_edu");
-            else if (title.contains("Experience")) showRenameDialog(findViewById(R.id.tvExperienceTitle), "name_exp");
-            else if (title.contains("Skills")) showRenameDialog(findViewById(R.id.tvSkillsTitle), "name_skills");
-            else if (title.contains("Volunteering")) showRenameDialog(findViewById(R.id.tvVolunteeringTitle), "name_vol");
-            else if (title.contains("Languages")) showRenameDialog(findViewById(R.id.tvLanguagesTitle), "name_lang");
-            else if (title.contains("Projects")) showRenameDialog(findViewById(R.id.tvProjectsTitle), "name_projects");
-            else if (title.contains("Awards")) showRenameDialog(findViewById(R.id.tvAwardsTitle), "name_awards");
+            if      (title.contains("Personal"))     showRenameDialog(findViewById(R.id.tvPersonalTitle),    "name_personal");
+            else if (title.contains("Education"))     showRenameDialog(findViewById(R.id.tvEducationTitle),   "name_edu");
+            else if (title.contains("Experience"))    showRenameDialog(findViewById(R.id.tvExperienceTitle),  "name_exp");
+            else if (title.contains("Skills"))        showRenameDialog(findViewById(R.id.tvSkillsTitle),      "name_skills");
+            else if (title.contains("Volunteering"))  showRenameDialog(findViewById(R.id.tvVolunteeringTitle),"name_vol");
+            else if (title.contains("Languages"))     showRenameDialog(findViewById(R.id.tvLanguagesTitle),   "name_lang");
+            else if (title.contains("Projects"))      showRenameDialog(findViewById(R.id.tvProjectsTitle),    "name_projects");
+            else if (title.contains("Awards"))        showRenameDialog(findViewById(R.id.tvAwardsTitle),      "name_awards");
             return true;
         });
         popup.show();
@@ -88,7 +105,8 @@ public class ResumeEditorActivity extends BaseActivity {
         FrameLayout container = new FrameLayout(this);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.leftMargin = 60; params.rightMargin = 60; // Better spacing
+        params.leftMargin  = 60;
+        params.rightMargin = 60;
         input.setLayoutParams(params);
         container.addView(input);
         builder.setView(container);
@@ -105,31 +123,37 @@ public class ResumeEditorActivity extends BaseActivity {
         builder.show();
     }
 
+    // ─── Load previously saved custom section names ───────────────────────────
+
     private void loadCustomNames() {
         var prefs = getSharedPreferences("CustomNames_" + currentResumeId, MODE_PRIVATE);
 
-        ((TextView)findViewById(R.id.tvPersonalTitle)).setText(prefs.getString("name_personal", "Personal Details"));
-        ((TextView)findViewById(R.id.tvEducationTitle)).setText(prefs.getString("name_edu", "Education"));
-        ((TextView)findViewById(R.id.tvExperienceTitle)).setText(prefs.getString("name_exp", "Experience"));
-        ((TextView)findViewById(R.id.tvSkillsTitle)).setText(prefs.getString("name_skills", "Skills"));
-        ((TextView)findViewById(R.id.tvVolunteeringTitle)).setText(prefs.getString("name_vol", "Volunteering"));
-        ((TextView)findViewById(R.id.tvLanguagesTitle)).setText(prefs.getString("name_lang", "Languages"));
-        ((TextView)findViewById(R.id.tvProjectsTitle)).setText(prefs.getString("name_projects", "Projects"));
-        ((TextView)findViewById(R.id.tvAwardsTitle)).setText(prefs.getString("name_awards", "Honors & Awards"));
+        ((TextView) findViewById(R.id.tvPersonalTitle)).setText(prefs.getString("name_personal", "Personal Details"));
+        ((TextView) findViewById(R.id.tvEducationTitle)).setText(prefs.getString("name_edu",      "Education"));
+        ((TextView) findViewById(R.id.tvExperienceTitle)).setText(prefs.getString("name_exp",     "Experience"));
+        ((TextView) findViewById(R.id.tvSkillsTitle)).setText(prefs.getString("name_skills",      "Skills"));
+        ((TextView) findViewById(R.id.tvVolunteeringTitle)).setText(prefs.getString("name_vol",   "Volunteering"));
+        ((TextView) findViewById(R.id.tvLanguagesTitle)).setText(prefs.getString("name_lang",     "Languages"));
+        ((TextView) findViewById(R.id.tvProjectsTitle)).setText(prefs.getString("name_projects",  "Projects"));
+        ((TextView) findViewById(R.id.tvAwardsTitle)).setText(prefs.getString("name_awards",      "Honors & Awards"));
     }
+
+    // ─── Show / hide optional sections ───────────────────────────────────────
 
     @Override
     protected void onResume() {
         super.onResume();
         String secPrefs = "Sections_" + currentResumeId;
-        boolean showProjects = getSharedPreferences(secPrefs, MODE_PRIVATE).getBoolean("Projects", false);
-        boolean showAwards = getSharedPreferences(secPrefs, MODE_PRIVATE).getBoolean("Honors & Awards", false);
+        boolean showProjects = getSharedPreferences(secPrefs, MODE_PRIVATE).getBoolean("Projects",       false);
+        boolean showAwards   = getSharedPreferences(secPrefs, MODE_PRIVATE).getBoolean("Honors & Awards", false);
 
         findViewById(R.id.btnProjects).setVisibility(showProjects ? View.VISIBLE : View.GONE);
-        findViewById(R.id.btnAwards).setVisibility(showAwards ? View.VISIBLE : View.GONE);
+        findViewById(R.id.btnAwards).setVisibility(showAwards   ? View.VISIBLE : View.GONE);
 
         loadCustomNames();
     }
+
+    // ─── Navigation helper ────────────────────────────────────────────────────
 
     private void openSection(Class<?> activityClass) {
         Intent intent = new Intent(this, activityClass);

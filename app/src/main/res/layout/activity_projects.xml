@@ -9,7 +9,7 @@
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="81dp"
-        android:background="@drawable/header_gradient"
+        android:background="@drawable/glass_card"
         android:elevation="4dp">
 
         <ImageButton
@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:text="Project"
-            android:textColor="#FFFFFF"
+            android:textColor="#432676"
             android:textSize="18sp"
             android:textStyle="bold" />
     </RelativeLayout>

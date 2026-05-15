@@ -56,17 +56,22 @@
             android:orientation="vertical"
             android:padding="20dp">
 
+            <!--
+                4:5 ratio photo — width=100dp, height=125dp.
+                NO app:tint here: the tint was overriding the loaded bitmap
+                making photos invisible. The placeholder icon colour is set in code.
+            -->
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/imgProfilePhoto"
-                android:layout_width="126dp"
-                android:layout_height="120dp"
+                android:layout_width="100dp"
+                android:layout_height="125dp"
                 android:layout_gravity="center"
                 android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
+                android:layout_marginBottom="4dp"
                 android:background="#F0F0F0"
                 android:padding="2dp"
+                android:scaleType="centerCrop"
                 android:src="@drawable/icon_account_circle"
-                app:tint="#46186E"
                 app:shapeAppearanceOverlay="@style/CircleImage"
                 app:strokeColor="#4B1F72"
                 app:strokeWidth="2dp" />
@@ -75,18 +80,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="Tap to add photo (Optional)"
-                android:textSize="12sp"
                 android:layout_marginBottom="24dp"
-                android:textColor="#757575"/>
+                android:text="Tap to add photo (Optional)"
+                android:textColor="#757575"
+                android:textSize="12sp" />
 
+            <!-- Full Name -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Full Name"
                 android:layout_marginBottom="8dp"
-                android:textStyle="bold"
-                android:textColor="@color/black"/>
+                android:text="Full Name"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
 
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -94,7 +100,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:hint="Your Name">
-
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editName"
                     android:layout_width="match_parent"
@@ -102,13 +107,14 @@
                     android:inputType="textCapWords" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- Email -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Email Address"
                 android:layout_marginBottom="8dp"
-                android:textStyle="bold"
-                android:textColor="@color/black"/>
+                android:text="Email Address"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
 
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -116,7 +122,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:hint="Email">
-
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editEmail"
                     android:layout_width="match_parent"
@@ -124,13 +129,14 @@
                     android:inputType="textEmailAddress" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- Phone -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Phone Number"
                 android:layout_marginBottom="8dp"
-                android:textStyle="bold"
-                android:textColor="@color/black"/>
+                android:text="Phone Number"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
 
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -138,7 +144,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:hint="Phone">
-
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editPhone"
                     android:layout_width="match_parent"
@@ -146,21 +151,21 @@
                     android:inputType="phone" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- Address -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Address"
                 android:layout_marginBottom="8dp"
-                android:textStyle="bold"
-                android:textColor="@color/black"/>
+                android:text="Address"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
 
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="32dp"
+                android:layout_marginBottom="16dp"
                 android:hint="City, Country">
-
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editAddress"
                     android:layout_width="match_parent"
@@ -168,16 +173,40 @@
                     android:inputType="textPostalAddress" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- LinkedIn -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="LinkedIn URL"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:hint="linkedin.com/in/yourname">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editLinkedin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textUri" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Professional Summary -->
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSave"
-                android:background="@drawable/buttonn"
-                app:backgroundTint="#381462"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/buttonn"
                 android:text="Save Details"
                 android:textAllCaps="false"
                 android:textSize="16sp"
+                app:backgroundTint="#381462"
                 app:cornerRadius="12dp" />
 
         </LinearLayout>
