@@ -21,6 +21,8 @@ import java.util.Map;
 
 public class EducationActivity extends BaseActivity {
 
+    public static final String EXTRA_ENTRY_INDEX = "ENTRY_INDEX";
+
     private TextInputEditText editSchool, editLocation, editDate, editDegree;
     private RecyclerView rvBullets;
     private BulletAdapter adapter;
@@ -28,7 +30,9 @@ public class EducationActivity extends BaseActivity {
 
     private AppDatabase db;
     private int currentResumeId;
+    private int entryIndex = -1;
     private Resume currentResume;
+    private List<EducationEntry> entries = new ArrayList<>();
 
     private UserProfileManager profileManager;
     private boolean isProfileMode;
@@ -41,6 +45,7 @@ public class EducationActivity extends BaseActivity {
         db              = AppDatabase.getInstance(this);
         profileManager  = new UserProfileManager();
         currentResumeId = getIntent().getIntExtra("RESUME_ID", -1);
+        entryIndex      = getIntent().getIntExtra(EXTRA_ENTRY_INDEX, -1);
         isProfileMode   = (currentResumeId == ProfileActivity.PROFILE_RESUME_ID);
 
         editSchool   = findViewById(R.id.editSchool);
@@ -100,22 +105,26 @@ public class EducationActivity extends BaseActivity {
         if (currentResumeId == -1) return;
         new Thread(() -> {
             currentResume = db.resumeDao().getResumeById(currentResumeId);
-            if (currentResume != null) {
-                String saved = currentResume.getSchoolDescription();
-                if (saved != null && !saved.isEmpty()) {
-                    bulletList.addAll(Arrays.asList(saved.split("\\|")));
-                } else {
-                    bulletList.add("");
-                }
-                runOnUiThread(() -> {
-                    editSchool.setText(currentResume.getSchoolName());
-                    editLocation.setText(currentResume.getSchoolLocation());
-                    editDate.setText(currentResume.getSchoolDate());
-                    editDegree.setText(currentResume.getDegree());
-                    adapter = new BulletAdapter(bulletList);
-                    rvBullets.setAdapter(adapter);
-                });
+            if (currentResume == null) return;
+            entries = ResumeEntries.parseEducation(currentResume.getEducationJson());
+
+            EducationEntry entry = (entryIndex >= 0 && entryIndex < entries.size())
+                    ? entries.get(entryIndex) : new EducationEntry();
+
+            if (entry.schoolDescription != null && !entry.schoolDescription.isEmpty()) {
+                bulletList.addAll(Arrays.asList(entry.schoolDescription.split("\\|")));
+            } else {
+                bulletList.add("");
             }
+
+            runOnUiThread(() -> {
+                editSchool.setText(entry.schoolName);
+                editLocation.setText(entry.schoolLocation);
+                editDate.setText(entry.schoolDate);
+                editDegree.setText(entry.degree);
+                adapter = new BulletAdapter(bulletList);
+                rvBullets.setAdapter(adapter);
+            });
         }).start();
     }
 
@@ -159,11 +168,21 @@ public class EducationActivity extends BaseActivity {
 
     private void saveResumeEducation() {
         if (currentResume == null) return;
-        currentResume.setSchoolName(str(editSchool));
-        currentResume.setSchoolLocation(str(editLocation));
-        currentResume.setSchoolDate(str(editDate));
-        currentResume.setDegree(str(editDegree));
-        currentResume.setSchoolDescription(buildActivitiesString());
+
+        EducationEntry entry = (entryIndex >= 0 && entryIndex < entries.size())
+                ? entries.get(entryIndex) : new EducationEntry();
+        entry.schoolName = str(editSchool);
+        entry.schoolLocation = str(editLocation);
+        entry.schoolDate = str(editDate);
+        entry.degree = str(editDegree);
+        entry.schoolDescription = buildActivitiesString();
+
+        if (entryIndex >= 0 && entryIndex < entries.size()) {
+            entries.set(entryIndex, entry);
+        } else {
+            entries.add(entry);
+        }
+        currentResume.setEducationJson(ResumeEntries.serializeEducation(entries));
 
         new Thread(() -> {
             db.resumeDao().update(currentResume);

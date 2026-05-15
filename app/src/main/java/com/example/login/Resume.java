@@ -16,19 +16,10 @@ public class Resume {
     private String phone;
     private String address;
 
-    // Education Fields
-    private String schoolName;
-    private String schoolLocation;
-    private String schoolDate;
-    private String degree;
-    private String schoolDescription;
-
-    // Experience Fields
-    private String expOrgName;
-    private String expPosition;
-    private String expLocation;
-    private String expDate;
-    private String expBullets;
+    // Education + Experience are JSON-encoded lists of entries.
+    // See EducationEntry / ExperienceEntry and ResumeEntries.
+    private String educationJson;
+    private String experienceJson;
 
     // Volunteering Fields
     private String volOrgName;
@@ -48,6 +39,9 @@ public class Resume {
     // Photo
     @ColumnInfo(name = "photo_path")
     private String photoPath;
+
+    @ColumnInfo(name = "template_id", defaultValue = "default")
+    private String templateId = "default";
 
     public Resume() {}
 
@@ -78,29 +72,15 @@ public class Resume {
     public String getPhotoPath() { return photoPath; }
     public void setPhotoPath(String photoPath) { this.photoPath = photoPath; }
 
-    // --- Education ---
-    public String getSchoolName() { return schoolName; }
-    public void setSchoolName(String schoolName) { this.schoolName = schoolName; }
-    public String getSchoolLocation() { return schoolLocation; }
-    public void setSchoolLocation(String schoolLocation) { this.schoolLocation = schoolLocation; }
-    public String getSchoolDate() { return schoolDate; }
-    public void setSchoolDate(String schoolDate) { this.schoolDate = schoolDate; }
-    public String getDegree() { return degree; }
-    public void setDegree(String degree) { this.degree = degree; }
-    public String getSchoolDescription() { return schoolDescription; }
-    public void setSchoolDescription(String schoolDescription) { this.schoolDescription = schoolDescription; }
+    // --- Template ---
+    public String getTemplateId() { return templateId; }
+    public void setTemplateId(String templateId) { this.templateId = templateId; }
 
-    // --- Experience ---
-    public String getExpOrgName() { return expOrgName; }
-    public void setExpOrgName(String expOrgName) { this.expOrgName = expOrgName; }
-    public String getExpPosition() { return expPosition; }
-    public void setExpPosition(String expPosition) { this.expPosition = expPosition; }
-    public String getExpLocation() { return expLocation; }
-    public void setExpLocation(String expLocation) { this.expLocation = expLocation; }
-    public String getExpDate() { return expDate; }
-    public void setExpDate(String expDate) { this.expDate = expDate; }
-    public String getExpBullets() { return expBullets; }
-    public void setExpBullets(String expBullets) { this.expBullets = expBullets; }
+    // --- Education / Experience (JSON lists) ---
+    public String getEducationJson() { return educationJson; }
+    public void setEducationJson(String educationJson) { this.educationJson = educationJson; }
+    public String getExperienceJson() { return experienceJson; }
+    public void setExperienceJson(String experienceJson) { this.experienceJson = experienceJson; }
 
     // --- Volunteering ---
     public String getVolOrgName() { return volOrgName; }

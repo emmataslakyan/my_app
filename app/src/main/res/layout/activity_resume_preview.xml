@@ -7,14 +7,15 @@
     android:layout_height="match_parent"
     android:background="@drawable/glass_card">
 
-
     <RelativeLayout
         android:id="@+id/topBar"
-        android:layout_width="0dp"  android:layout_height="73dp"
+        android:layout_width="0dp"
+        android:layout_height="73dp"
         android:background="@drawable/glass_card"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"  app:layout_constraintEnd_toEndOf="parent"      tools:layout_editor_absoluteX="-2dp">
-
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:layout_editor_absoluteX="-2dp">
 
         <ImageButton
             android:id="@+id/backBtn"
@@ -25,7 +26,6 @@
             android:contentDescription="@string/desc_back"
             android:foreground="@drawable/back" />
 
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -35,7 +35,6 @@
             android:textSize="20sp"
             android:textStyle="bold" />
     </RelativeLayout>
-
 
     <androidx.cardview.widget.CardView
         android:id="@+id/resumePaper"
@@ -51,12 +50,22 @@
         app:layout_constraintTop_toBottomOf="@id/topBar"
         app:layout_constraintVertical_bias="0.482">
 
-
-        <include layout="@layout/resume_content_minimal" />
-
+        <WebView
+            android:id="@+id/resumeWebView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/white" />
 
     </androidx.cardview.widget.CardView>
 
+    <ProgressBar
+        android:id="@+id/resumeLoading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/resumePaper"
+        app:layout_constraintBottom_toBottomOf="@id/resumePaper"
+        app:layout_constraintStart_toStartOf="@id/resumePaper"
+        app:layout_constraintEnd_toEndOf="@id/resumePaper" />
 
     <Button
         android:id="@+id/downloadBtn"
@@ -74,7 +83,6 @@
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent" />
 
-
     <LinearLayout
         android:id="@+id/bottomToolbar"
         android:layout_width="match_parent"
@@ -86,7 +94,6 @@
         android:padding="8dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
-
         <ImageButton
             android:id="@+id/btnEdit"
             android:layout_width="0dp"
@@ -96,18 +103,6 @@
             android:contentDescription="@string/edit_profile"
             android:src="@android:drawable/ic_menu_edit"
             app:tint="#432676" />
-
-
-        <ImageButton
-            android:id="@+id/btnTextSize"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/desc_edit_sections"
-            android:src="@android:drawable/ic_menu_sort_alphabetically"
-            app:tint="#432676" />
-
 
         <ImageButton
             android:id="@+id/btnZoom"
@@ -119,7 +114,6 @@
             android:src="@android:drawable/ic_menu_search"
             app:tint="#432676" />
 
-
         <ImageButton
             android:id="@+id/btnShare"
             android:layout_width="0dp"
@@ -130,9 +124,6 @@
             android:src="@android:drawable/ic_menu_share"
             app:tint="#432676" />
 
-
     </LinearLayout>
 
-
 </androidx.constraintlayout.widget.ConstraintLayout>
-

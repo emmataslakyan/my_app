@@ -57,7 +57,13 @@
             android:name=".EducationActivity"
             android:exported="false"/>
         <activity
+            android:name=".EducationListActivity"
+            android:exported="false"/>
+        <activity
             android:name=".ExperienceActivity"
+            android:exported="false"/>
+        <activity
+            android:name=".ExperienceListActivity"
             android:exported="false"/>
         <activity
             android:name=".VolunteeringActivity"

@@ -1,11 +1,12 @@
 package com.example.login;
 
 import android.content.Context;
+
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-@Database(entities = {Resume.class}, version = 10, exportSchema = false)
+@Database(entities = {Resume.class}, version = 11, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract ResumeDao resumeDao();

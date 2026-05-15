@@ -14,13 +14,17 @@ import java.util.List;
 
 public class ExperienceActivity extends BaseActivity {
 
+    public static final String EXTRA_ENTRY_INDEX = "ENTRY_INDEX";
+
     private TextInputEditText editOrg, editPos, editLoc, editDate;
     private RecyclerView rvBullets;
     private BulletAdapter adapter;
     private final List<String> bulletList = new ArrayList<>();
     private AppDatabase db;
     private int resumeId;
+    private int entryIndex = -1;
     private Resume resume;
+    private List<ExperienceEntry> entries = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +34,7 @@ public class ExperienceActivity extends BaseActivity {
         // 1. Initialize Database and Data
         db = AppDatabase.getInstance(this);
         resumeId = getIntent().getIntExtra("RESUME_ID", -1);
+        entryIndex = getIntent().getIntExtra(EXTRA_ENTRY_INDEX, -1);
 
         // 2. Bind Views
         editOrg = findViewById(R.id.editOrgName);
@@ -81,44 +86,39 @@ public class ExperienceActivity extends BaseActivity {
 
         new Thread(() -> {
             resume = db.resumeDao().getResumeById(resumeId);
-            if (resume != null) {
-                String savedBullets = resume.getExpBullets();
-                bulletList.clear(); // Clear to avoid duplicates on reload
-                if (savedBullets != null && !savedBullets.isEmpty()) {
-                    String[] points = savedBullets.split("\\|");
-                    bulletList.addAll(Arrays.asList(points));
-                } else {
-                    bulletList.add(""); // Start with one empty line
-                }
+            if (resume == null) return;
+            entries = ResumeEntries.parseExperience(resume.getExperienceJson());
 
-                runOnUiThread(() -> {
-                    editOrg.setText(resume.getExpOrgName());
-                    editPos.setText(resume.getExpPosition());
-                    editLoc.setText(resume.getExpLocation());
-                    editDate.setText(resume.getExpDate());
+            ExperienceEntry entry = (entryIndex >= 0 && entryIndex < entries.size())
+                    ? entries.get(entryIndex) : new ExperienceEntry();
 
-                    adapter = new BulletAdapter(bulletList);
-                    rvBullets.setAdapter(adapter);
-                });
+            bulletList.clear();
+            if (entry.expBullets != null && !entry.expBullets.isEmpty()) {
+                bulletList.addAll(Arrays.asList(entry.expBullets.split("\\|")));
+            } else {
+                bulletList.add("");
             }
+
+            runOnUiThread(() -> {
+                editOrg.setText(entry.expOrgName);
+                editPos.setText(entry.expPosition);
+                editLoc.setText(entry.expLocation);
+                editDate.setText(entry.expDate);
+
+                adapter = new BulletAdapter(bulletList);
+                rvBullets.setAdapter(adapter);
+            });
         }).start();
     }
 
     private void saveExperience() {
         if (resume == null) return;
 
-        // Extracting text safely
         String org = editOrg.getText() != null ? editOrg.getText().toString() : "";
         String pos = editPos.getText() != null ? editPos.getText().toString() : "";
         String loc = editLoc.getText() != null ? editLoc.getText().toString() : "";
         String date = editDate.getText() != null ? editDate.getText().toString() : "";
 
-        resume.setExpOrgName(org);
-        resume.setExpPosition(pos);
-        resume.setExpLocation(loc);
-        resume.setExpDate(date);
-
-        // Join bullets into a single pipe-separated string
         StringBuilder sb = new StringBuilder();
         if (adapter != null) {
             for (String s : adapter.getBullets()) {
@@ -127,7 +127,21 @@ public class ExperienceActivity extends BaseActivity {
                 }
             }
         }
-        resume.setExpBullets(sb.toString());
+
+        ExperienceEntry entry = (entryIndex >= 0 && entryIndex < entries.size())
+                ? entries.get(entryIndex) : new ExperienceEntry();
+        entry.expOrgName = org;
+        entry.expPosition = pos;
+        entry.expLocation = loc;
+        entry.expDate = date;
+        entry.expBullets = sb.toString();
+
+        if (entryIndex >= 0 && entryIndex < entries.size()) {
+            entries.set(entryIndex, entry);
+        } else {
+            entries.add(entry);
+        }
+        resume.setExperienceJson(ResumeEntries.serializeExperience(entries));
 
         new Thread(() -> {
             db.resumeDao().update(resume);

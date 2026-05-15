@@ -37,8 +37,8 @@ public class ResumeEditorActivity extends BaseActivity {
 
         // Section navigation
         findViewById(R.id.btnPersonalDetails).setOnClickListener(v -> openSection(PersonalDetailsActivity.class));
-        findViewById(R.id.btnEducation).setOnClickListener(v -> openSection(EducationActivity.class));
-        findViewById(R.id.btnExperience).setOnClickListener(v -> openSection(ExperienceActivity.class));
+        findViewById(R.id.btnEducation).setOnClickListener(v -> openSection(EducationListActivity.class));
+        findViewById(R.id.btnExperience).setOnClickListener(v -> openSection(ExperienceListActivity.class));
         findViewById(R.id.btnSkills).setOnClickListener(v -> openSection(SkillsActivity.class));
         findViewById(R.id.btnVolunteering).setOnClickListener(v -> openSection(VolunteeringActivity.class));
         findViewById(R.id.btnLanguages).setOnClickListener(v -> openSection(LanguagesActivity.class));
