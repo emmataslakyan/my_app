@@ -14,11 +14,14 @@ import androidx.core.os.LocaleListCompat;
 import androidx.credentials.CredentialManager;
 import androidx.credentials.GetCredentialRequest;
 import androidx.credentials.GetCredentialResponse;
+import androidx.credentials.exceptions.GetCredentialCancellationException;
 import androidx.credentials.exceptions.GetCredentialException;
 import androidx.credentials.CredentialManagerCallback;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.SignInButton;
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption;
+import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption;
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.auth.AuthCredential;
@@ -101,14 +104,34 @@ public class MainActivity extends BaseActivity {
     }
 
     private void startGoogleLogin() {
+        // Pre-flight: Google Sign-In requires Google Play Services. If it's missing or
+        // outdated on the device, Credential Manager would fail with a confusing
+        // "No credentials available" — show Google's own update/recovery dialog instead.
+        GoogleApiAvailability api = GoogleApiAvailability.getInstance();
+        int status = api.isGooglePlayServicesAvailable(this);
+        if (status != ConnectionResult.SUCCESS) {
+            if (api.isUserResolvableError(status)) {
+                api.getErrorDialog(this, status, /*requestCode*/ 9001).show();
+            } else {
+                Toast.makeText(this,
+                        "Google Sign-In isn't supported on this device.",
+                        Toast.LENGTH_LONG).show();
+            }
+            return;
+        }
+
         CredentialManager credentialManager = CredentialManager.create(this);
-        GetGoogleIdOption googleIdOption = new GetGoogleIdOption.Builder()
-                .setFilterByAuthorizedAccounts(false)
-                .setServerClientId(getString(R.string.client_id))
-                .build();
+
+        // GetSignInWithGoogleOption is the right option when the user explicitly taps a
+        // "Sign in with Google" button: it triggers the full account picker (and lets the
+        // user add a Google account if none is signed in on the device). GetGoogleIdOption
+        // is for silent / bottom-sheet flows and returns "No credentials available" when
+        // there's no previously-authorized account for this client ID.
+        GetSignInWithGoogleOption googleOption =
+                new GetSignInWithGoogleOption.Builder(getString(R.string.client_id)).build();
 
         GetCredentialRequest request = new GetCredentialRequest.Builder()
-                .addCredentialOption(googleIdOption).build();
+                .addCredentialOption(googleOption).build();
 
         credentialManager.getCredentialAsync(this, request, null, Runnable::run,
                 new CredentialManagerCallback<GetCredentialResponse, GetCredentialException>() {
@@ -119,12 +142,19 @@ public class MainActivity extends BaseActivity {
                                     GoogleIdTokenCredential.createFrom(result.getCredential().getData());
                             firebaseAuthWithGoogle(googleIdTokenCredential.getIdToken());
                         } catch (Exception e) {
-                            Log.e("Auth", "Error: " + e.getMessage());
+                            Log.e("Auth", "Token parse failed", e);
+                            runOnUiThread(() -> Toast.makeText(MainActivity.this,
+                                    "Google Sign-In failed", Toast.LENGTH_SHORT).show());
                         }
                     }
                     @Override
                     public void onError(GetCredentialException e) {
-                        Log.e("Auth", "Failed: " + e.getMessage());
+                        Log.e("Auth", "GetCredential failed", e);
+                        // User dismissed the picker — silent.
+                        if (e instanceof GetCredentialCancellationException) return;
+                        runOnUiThread(() -> Toast.makeText(MainActivity.this,
+                                "Google Sign-In unavailable: " + e.getMessage(),
+                                Toast.LENGTH_LONG).show());
                     }
                 });
     }
@@ -136,9 +166,17 @@ public class MainActivity extends BaseActivity {
                     if (task.isSuccessful()) {
                         saveUserToFirestoreBackground(mAuth.getCurrentUser());
                         navigateToHome();
-                    } else {
-                        Toast.makeText(this, "Google Sign-In Failed", Toast.LENGTH_SHORT).show();
+                        return;
                     }
+                    Exception ex = task.getException();
+                    Log.e("Auth", "Firebase signInWithCredential failed", ex);
+                    String msg = ex != null && ex.getMessage() != null
+                            ? ex.getMessage()
+                            : "Unknown error";
+                    // The most common cause here is a missing/incorrect SHA-1 fingerprint
+                    // in the Firebase project for the current signing key.
+                    Toast.makeText(this, "Google Sign-In Failed: " + msg,
+                            Toast.LENGTH_LONG).show();
                 });
     }
 
