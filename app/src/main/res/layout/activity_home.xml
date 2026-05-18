@@ -386,7 +386,7 @@
 
 
             <com.google.android.material.card.MaterialCardView
-                android:id="@+id/opp_section"
+                android:id="@+id/programs_section"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="28dp"
@@ -396,7 +396,6 @@
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp">
 
-
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="74dp"
@@ -405,20 +404,15 @@
                     android:orientation="horizontal"
                     android:padding="18dp">
 
-
                     <ImageView
                         android:layout_width="40dp"
                         android:layout_height="50dp"
-
-
-                        android:contentDescription="Resume Builder Icon"
+                        android:contentDescription="Discover Opportunities Icon"
                         android:src="@drawable/opp"
                         app:tint="#46287A" />
 
-
-                    <!--  ★ GRADIENT TARGET: discoverLabel  -->
                     <TextView
-                        android:id="@+id/discoverLabel"
+                        android:id="@+id/programsLabel"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="14dp"
@@ -429,7 +423,6 @@
                         android:textSize="20sp"
                         android:textStyle="bold" />
 
-
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -439,6 +432,7 @@
                         android:textSize="22sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+
             <!-- ════════════════════════════════════════
                  DISCOVER OPPORTUNITIES ROW
                  ════════════════════════════════════════ -->

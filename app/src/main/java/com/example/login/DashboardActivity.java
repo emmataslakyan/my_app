@@ -46,7 +46,6 @@ public class DashboardActivity extends BaseActivity {
     private TextView continueLabel;
     private TextView pdfToolsLabel;
     private TextView sparkAssistantText;
-    private TextView discoverLabel;
 
     // ─────────────────────────────────────────────
     // LIFECYCLE
@@ -90,7 +89,6 @@ public class DashboardActivity extends BaseActivity {
         continueLabel      = findViewById(R.id.continueLabel);
 
         sparkAssistantText = findViewById(R.id.sparkAssistantText);
-        discoverLabel      = findViewById(R.id.discoverLabel);
     }
 
     // ─────────────────────────────────────────────
@@ -117,11 +115,6 @@ public class DashboardActivity extends BaseActivity {
             GradientTextUtils.applyGradient(sparkAssistantText,
                     Color.parseColor("#FFFFFF"),
                     Color.parseColor("#BBA8DE"));
-
-        if (discoverLabel != null)
-            GradientTextUtils.applyGradient(discoverLabel,
-                    Color.parseColor("#051256"),
-                    Color.parseColor("#7B2FF7"));
     }
 
     // ─────────────────────────────────────────────

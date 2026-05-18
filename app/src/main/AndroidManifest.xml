@@ -32,7 +32,7 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDxiQAxxDS-SpNtDHelAR0UHOzgAzE-ito" />
         <activity
-            android:name=".OpportunitiesActivity"
+            android:name=".ProgramsActivity"
             android:exported="false" />
 
         <activity

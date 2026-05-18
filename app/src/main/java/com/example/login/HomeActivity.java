@@ -29,7 +29,7 @@ public class HomeActivity extends BaseActivity {
     private LinearLayout     aiSection;
     private LinearLayout     opportunitiesSection;
     private MaterialCardView resumeSection;
-    private MaterialCardView oppSection;
+    private MaterialCardView programsSection;
     private MaterialCardView profileSection;
     private MaterialCardView btnMergeLayout;
     private MaterialCardView btnSplitLayout;
@@ -49,7 +49,6 @@ public class HomeActivity extends BaseActivity {
     private TextView dashboardTitle;
     private TextView continueLabel;
     private TextView sparkAssistantText;
-    private TextView discoverLabel;
     private TextView pdfToolsLabel;
 
 
@@ -84,7 +83,6 @@ public class HomeActivity extends BaseActivity {
         dashboardTitle     = findViewById(R.id.dashboard_title);
         continueLabel      = findViewById(R.id.continueLabel);
         sparkAssistantText = findViewById(R.id.sparkAssistantText);
-        discoverLabel      = findViewById(R.id.discoverLabel);
         pdfToolsLabel      = findViewById(R.id.pdf_tools_label);
 
 
@@ -92,7 +90,7 @@ public class HomeActivity extends BaseActivity {
         btnLanguageMenu      = findViewById(R.id.btn_language_menu);
         aiSection            = findViewById(R.id.ai_section);
         resumeSection        = findViewById(R.id.resume_section);
-        oppSection           = findViewById(R.id.opp_section);
+        programsSection      = findViewById(R.id.programs_section);
         opportunitiesSection = findViewById(R.id.opportunities_section);
         profileSection       = findViewById(R.id.profile_section);
 
@@ -130,12 +128,6 @@ public class HomeActivity extends BaseActivity {
             GradientTextUtils.applyGradient(sparkAssistantText,
                     Color.parseColor("#FFFFFF"),
                     Color.parseColor("#BBA8DE"));
-
-
-//        if (discoverLabel != null)
-//            GradientTextUtils.applyGradient(discoverLabel,
-//                    Color.parseColor("#051256"),
-//                    Color.parseColor("#7B2FF7"));
 
 
         if (pdfToolsLabel != null)
@@ -185,9 +177,9 @@ public class HomeActivity extends BaseActivity {
                     startActivity(new Intent(this, MyResumesActivity.class)));
 
 
-        if (oppSection != null)
-            oppSection.setOnClickListener(v ->
-                    startActivity(new Intent(this, OpportunitiesActivity.class)));
+        if (programsSection != null)
+            programsSection.setOnClickListener(v ->
+                    startActivity(new Intent(this, ProgramsActivity.class)));
 
 
         if (btnViewResume != null)
