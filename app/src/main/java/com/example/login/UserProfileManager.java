@@ -38,6 +38,16 @@ public class UserProfileManager {
     public static final String DOC_UPLOADED = "uploadedAt";
     public static final String DOC_ID       = "id";
 
+    public static final String EXP_ORG     = "orgName";
+    public static final String EXP_POS     = "position";
+    public static final String EXP_LOC     = "location";
+    public static final String EXP_DATE    = "date";
+    public static final String EXP_BULLETS = "bullets";
+    public static final String EXP_ID      = "id";
+
+    public static final String KEY_SKILLS     = "skills";
+    public static final String KEY_LANGUAGES  = "languages";
+
     private final FirebaseFirestore db;
     private final String uid;
 
@@ -61,6 +71,10 @@ public class UserProfileManager {
 
     private com.google.firebase.firestore.CollectionReference documentsRef() {
         return db.collection("users").document(uid).collection("documents");
+    }
+
+    private com.google.firebase.firestore.CollectionReference experienceRef() {
+        return db.collection("users").document(uid).collection("experience");
     }
 
     // ── Profile ───────────────────────────────────────────────────────────────
@@ -172,10 +186,7 @@ public class UserProfileManager {
     public void loadDocuments(OnDataCallback<List<Map<String, Object>>> callback,
                               OnFailureCallback onFailure) {
         if (uid == null) { onFailure.onFailure("User not signed in"); return; }
-        documentsRef()
-                .orderBy(DOC_UPLOADED,
-                        com.google.firebase.firestore.Query.Direction.DESCENDING)
-                .get()
+        documentsRef().get()
                 .addOnSuccessListener(query -> {
                     List<Map<String, Object>> list = new ArrayList<>();
                     for (var snap : query.getDocuments()) {
@@ -193,6 +204,59 @@ public class UserProfileManager {
         documentsRef().document(entryId).delete()
                 .addOnSuccessListener(v -> onSuccess.onSuccess())
                 .addOnFailureListener(e -> onFailure.onFailure(e.getMessage()));
+    }
+
+    // ── Experience ────────────────────────────────────────────────────────────
+
+    public void saveExperienceEntry(String entryId, String org, String pos, String loc,
+                                    String date, String bullets,
+                                    OnSuccessCallback onSuccess, OnFailureCallback onFailure) {
+        if (uid == null) { onFailure.onFailure("User not signed in"); return; }
+        Map<String, Object> entry = new HashMap<>();
+        entry.put(EXP_ORG, org);
+        entry.put(EXP_POS, pos);
+        entry.put(EXP_LOC, loc);
+        entry.put(EXP_DATE, date);
+        entry.put(EXP_BULLETS, bullets);
+        DocumentReference ref = (entryId == null || entryId.isEmpty())
+                ? experienceRef().document()
+                : experienceRef().document(entryId);
+        ref.set(entry, SetOptions.merge())
+                .addOnSuccessListener(v -> onSuccess.onSuccess())
+                .addOnFailureListener(e -> onFailure.onFailure(e.getMessage()));
+    }
+
+    public void loadExperience(OnDataCallback<List<Map<String, Object>>> callback,
+                               OnFailureCallback onFailure) {
+        if (uid == null) { onFailure.onFailure("User not signed in"); return; }
+        experienceRef().get()
+                .addOnSuccessListener(query -> {
+                    List<Map<String, Object>> list = new ArrayList<>();
+                    for (var doc : query.getDocuments()) {
+                        Map<String, Object> e = doc.getData();
+                        if (e != null) { e.put(EXP_ID, doc.getId()); list.add(e); }
+                    }
+                    callback.onData(list);
+                })
+                .addOnFailureListener(e -> onFailure.onFailure(e.getMessage()));
+    }
+
+    public void deleteExperienceEntry(String entryId,
+                                      OnSuccessCallback onSuccess, OnFailureCallback onFailure) {
+        if (uid == null) { onFailure.onFailure("User not signed in"); return; }
+        experienceRef().document(entryId).delete()
+                .addOnSuccessListener(v -> onSuccess.onSuccess())
+                .addOnFailureListener(e -> onFailure.onFailure(e.getMessage()));
+    }
+
+    // ── Skills ────────────────────────────────────────────────────────────────
+
+    public void saveSkills(String skills, OnSuccessCallback onSuccess, OnFailureCallback onFailure) {
+        saveExtraField(KEY_SKILLS, skills, onSuccess, onFailure);
+    }
+
+    public void saveLanguages(String languages, OnSuccessCallback onSuccess, OnFailureCallback onFailure) {
+        saveExtraField(KEY_LANGUAGES, languages, onSuccess, onFailure);
     }
 
     // ── Resume auto-population ────────────────────────────────────────────────

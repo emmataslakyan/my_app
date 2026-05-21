@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="12dp"
+    android:padding="10dp"
     android:gravity="center_vertical"
     android:background="?attr/selectableItemBackground">
 
@@ -11,7 +11,8 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:src="@android:drawable/ic_menu_agenda"
-        android:contentDescription="Doc Icon"
+        android:contentDescription="PDF"
+        android:tint="#6133B8"
         android:layout_marginEnd="12dp" />
 
     <TextView
@@ -21,12 +22,18 @@
         android:layout_weight="1"
         android:text="Document Name"
         android:textColor="#212121"
-        android:textSize="14sp" />
+        android:textSize="14sp"
+        android:ellipsize="end"
+        android:maxLines="1" />
 
-    <ImageView
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:src="@android:drawable/ic_menu_view"
-        android:contentDescription="View Icon" />
+    <ImageButton
+        android:id="@+id/btn_doc_delete"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@android:drawable/ic_menu_delete"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:tint="#CC0000"
+        android:contentDescription="Delete document"
+        android:layout_marginStart="8dp" />
 
 </LinearLayout>

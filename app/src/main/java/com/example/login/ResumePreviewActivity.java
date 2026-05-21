@@ -79,6 +79,14 @@ public class ResumePreviewActivity extends BaseActivity {
                 });
                 return;
             }
+            // Fall back to global profile photo if this resume has none
+            if (resume.getPhotoPath() == null || resume.getPhotoPath().isEmpty()) {
+                String global = getSharedPreferences("ProfilePrefs", MODE_PRIVATE)
+                        .getString("profile_photo_path", null);
+                if (global != null && new java.io.File(global).exists()) {
+                    resume.setPhotoPath(global);
+                }
+            }
             ResumeTemplate tpl = resolveTemplate(resume.getTemplateId());
             Map<String, Object> ctx = ResumeDataMapper.toContext(resume);
             repository.loadTemplateHtml(tpl, new TemplateRepository.HtmlCallback() {

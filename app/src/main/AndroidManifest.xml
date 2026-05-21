@@ -75,6 +75,30 @@
             android:name=".HomeActivity"
             android:exported="false" />
         <activity
+            android:name=".DashboardActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ProfileEditActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MergePdfActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MergedPdfPreviewActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SplitPdfActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SplitResultActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CompressPdfActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ImgToPdfActivity"
+            android:exported="false" />
+        <activity
             android:name=".ResumeEditorActivity"
             android:exported="false" />
         <activity
@@ -85,6 +109,10 @@
             android:exported="false" />
         <activity
             android:name=".AiAssistantActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ChatHistoryActivity"
             android:exported="false" />
 
         <activity

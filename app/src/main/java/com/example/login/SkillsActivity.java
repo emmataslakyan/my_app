@@ -19,6 +19,9 @@ public class SkillsActivity extends BaseActivity {
     private int resumeId;
     private Resume resume;
 
+    private UserProfileManager profileManager;
+    private boolean isProfileMode;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,12 +29,14 @@ public class SkillsActivity extends BaseActivity {
 
         db = AppDatabase.getInstance(this);
         resumeId = getIntent().getIntExtra("RESUME_ID", -1);
+        isProfileMode = (resumeId == ProfileActivity.PROFILE_RESUME_ID);
+        profileManager = new UserProfileManager();
         rvSkills = findViewById(R.id.rvSkills);
         rvSkills.setLayoutManager(new LinearLayoutManager(this));
 
         findViewById(R.id.backBtn).setOnClickListener(v -> finish());
         findViewById(R.id.btnUpgradeHint).setOnClickListener(v -> showSkillGuide());
-        findViewById(R.id.btnAddSkill).setOnClickListener(v -> adapter.addSkill());
+        findViewById(R.id.btnAddSkill).setOnClickListener(v -> { if (adapter != null) adapter.addSkill(); });
         findViewById(R.id.btnSaveSkills).setOnClickListener(v -> saveSkills());
 
         loadData();
@@ -51,12 +56,13 @@ public class SkillsActivity extends BaseActivity {
     }
 
     private void loadData() {
+        if (isProfileMode) { loadProfileSkills(); return; }
         new Thread(() -> {
             resume = db.resumeDao().getResumeById(resumeId);
             if (resume != null && resume.getSkills() != null) {
                 skillList.addAll(Arrays.asList(resume.getSkills().split("\\|")));
             } else {
-                skillList.add(":Beginner"); // Default empty item
+                skillList.add(":Beginner");
             }
             runOnUiThread(() -> {
                 adapter = new SkillAdapter(skillList);
@@ -65,10 +71,39 @@ public class SkillsActivity extends BaseActivity {
         }).start();
     }
 
+    private void loadProfileSkills() {
+        profileManager.loadProfile(data -> runOnUiThread(() -> {
+            Object v = data.get(UserProfileManager.KEY_SKILLS);
+            String stored = v != null ? v.toString() : "";
+            if (!stored.isEmpty()) {
+                skillList.addAll(Arrays.asList(stored.split("\\|")));
+            } else {
+                skillList.add(":Beginner");
+            }
+            adapter = new SkillAdapter(skillList);
+            rvSkills.setAdapter(adapter);
+        }), err -> runOnUiThread(() -> {
+            skillList.add(":Beginner");
+            adapter = new SkillAdapter(skillList);
+            rvSkills.setAdapter(adapter);
+        }));
+    }
+
     private void saveSkills() {
+        if (adapter == null) return;
         StringBuilder sb = new StringBuilder();
         for (String s : adapter.getSkillsList()) {
             if (!s.startsWith(":")) sb.append(s).append("|");
+        }
+        if (isProfileMode) {
+            profileManager.saveSkills(sb.toString(),
+                    () -> runOnUiThread(() -> {
+                        Toast.makeText(this, "Skills Saved!", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }),
+                    err -> runOnUiThread(() ->
+                            Toast.makeText(this, "Save failed: " + err, Toast.LENGTH_SHORT).show()));
+            return;
         }
         new Thread(() -> {
             resume.setSkills(sb.toString());

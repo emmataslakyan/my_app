@@ -34,6 +34,7 @@ public class HomeActivity extends BaseActivity {
     private MaterialCardView btnMergeLayout;
     private MaterialCardView btnSplitLayout;
     private MaterialCardView btnCompressLayout;
+    private MaterialCardView btnImgToPdfLayout;
 
 
     // ── Resume hero card ─────────────────────────
@@ -98,6 +99,7 @@ public class HomeActivity extends BaseActivity {
         btnMergeLayout       = findViewById(R.id.tile_peer);
         btnSplitLayout       = findViewById(R.id.tile_split);
         btnCompressLayout    = findViewById(R.id.tile_compress);
+        btnImgToPdfLayout    = findViewById(R.id.tile_img_to_pdf);
 
 
         // Resume hero card
@@ -205,6 +207,10 @@ public class HomeActivity extends BaseActivity {
         if (btnCompressLayout != null)
             btnCompressLayout.setOnClickListener(v ->
                     startActivity(new Intent(this, CompressPdfActivity.class)));
+
+        if (btnImgToPdfLayout != null)
+            btnImgToPdfLayout.setOnClickListener(v ->
+                    startActivity(new Intent(this, ImgToPdfActivity.class)));
     }
 
 

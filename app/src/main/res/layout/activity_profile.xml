@@ -311,98 +311,6 @@
                     android:src="@android:drawable/ic_menu_edit"
                     app:tint="#6133B8" />
             </LinearLayout>
-                <!-- School Name -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:layout_marginBottom="8dp"
-                    android:orientation="horizontal">
-                    <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:contentDescription=""
-                        android:src="@drawable/person"
-                        app:tint="#888888" />
-                    <TextView
-                        android:id="@+id/school_name"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:text="—"
-                        android:textColor="#444444"
-                        android:textSize="14sp" />
-                </LinearLayout>
-
-                <!-- Location -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:layout_marginBottom="8dp"
-                    android:orientation="horizontal">
-                    <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:contentDescription=""
-                        android:src="@drawable/email"
-                        app:tint="#888888" />
-                    <TextView
-                        android:id="@+id/location"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:text="—"
-                        android:textColor="#444444"
-                        android:textSize="14sp" />
-                </LinearLayout>
-
-                <!-- Degree -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:layout_marginBottom="8dp"
-                    android:orientation="horizontal">
-                    <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:contentDescription=""
-                        android:src="@android:drawable/ic_menu_call"
-                        app:tint="#888888" />
-                    <TextView
-                        android:id="@+id/degree"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:text="—"
-                        android:textColor="#444444"
-                        android:textSize="14sp" />
-                </LinearLayout>
-
-                <!-- Month, Year -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:layout_marginBottom="8dp"
-                    android:orientation="horizontal">
-                    <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:contentDescription=""
-                        android:src="@android:drawable/ic_menu_mapmode"
-                        app:tint="#888888" />
-                    <TextView
-                        android:id="@+id/month_year"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:text="—"
-                        android:textColor="#444444"
-                        android:textSize="14sp" />
-                </LinearLayout>
-
                 <LinearLayout
                     android:id="@+id/container_education"
                     android:layout_width="match_parent"
@@ -417,6 +325,222 @@
                     android:gravity="center"
                     android:padding="8dp"
                     android:text="Tap the pencil to add your education."
+                    android:textColor="#AAAAAA"
+                    android:textSize="13sp"
+                    android:visibility="visible" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- ── Experience Card ── -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="14dp"
+            app:cardBackgroundColor="#00FFFFFF"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:background="@drawable/glass_card">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:contentDescription=""
+                        android:src="@android:drawable/ic_menu_agenda"
+                        app:tint="#6133B8" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:text="Experience"
+                        android:textColor="#431772"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <ImageButton
+                        android:id="@+id/btn_edit_experience"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Edit experience"
+                        android:src="@android:drawable/ic_menu_edit"
+                        app:tint="#6133B8" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/container_experience"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:animateLayoutChanges="true" />
+
+                <TextView
+                    android:id="@+id/tv_exp_empty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:padding="8dp"
+                    android:text="Tap the pencil to add your experience."
+                    android:textColor="#AAAAAA"
+                    android:textSize="13sp"
+                    android:visibility="visible" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- ── Skills Card ── -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="14dp"
+            app:cardBackgroundColor="@android:color/transparent"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/glass_card"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:contentDescription=""
+                        android:src="@drawable/person"
+                        app:tint="#6133B8" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:text="Skills"
+                        android:textColor="#431772"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <ImageButton
+                        android:id="@+id/btn_edit_skills"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Edit skills"
+                        android:src="@android:drawable/ic_menu_edit"
+                        app:tint="#6133B8" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/container_skills"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:animateLayoutChanges="true" />
+
+                <TextView
+                    android:id="@+id/tv_skills_empty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:padding="8dp"
+                    android:text="Tap the pencil to add your skills."
+                    android:textColor="#AAAAAA"
+                    android:textSize="13sp"
+                    android:visibility="visible" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- ── Languages Card ── -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="14dp"
+            app:cardBackgroundColor="@android:color/transparent"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/glass_card"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:contentDescription=""
+                        android:src="@drawable/language"
+                        app:tint="#6133B8" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:text="Languages"
+                        android:textColor="#431772"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <ImageButton
+                        android:id="@+id/btn_edit_languages"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Edit languages"
+                        android:src="@android:drawable/ic_menu_edit"
+                        app:tint="#6133B8" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/container_languages"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:animateLayoutChanges="true" />
+
+                <TextView
+                    android:id="@+id/tv_languages_empty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:padding="8dp"
+                    android:text="Tap the pencil to add your languages."
                     android:textColor="#AAAAAA"
                     android:textSize="13sp"
                     android:visibility="visible" />

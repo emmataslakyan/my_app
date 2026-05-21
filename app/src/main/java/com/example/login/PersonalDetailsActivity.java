@@ -238,9 +238,17 @@ public class PersonalDetailsActivity extends BaseActivity {
                     // pre-filled values come from the Firestore snapshot via applySnapshotToPrefs
 
                     String savedPath = currentResume.getPhotoPath();
-                    if (savedPath != null) {
+                    if (savedPath != null && new java.io.File(savedPath).exists()) {
                         pendingPhotoPath = savedPath;
                         loadBitmapIntoView(savedPath);
+                    } else {
+                        // No per-resume photo yet — pre-fill with the global profile photo
+                        String profilePath = getSharedPreferences("ProfilePrefs", MODE_PRIVATE)
+                                .getString("profile_photo_path", null);
+                        if (profilePath != null && new java.io.File(profilePath).exists()) {
+                            pendingPhotoPath = profilePath;
+                            loadBitmapIntoView(profilePath);
+                        }
                     }
                 });
             }).start();

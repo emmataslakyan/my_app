@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ExperienceListActivity extends BaseActivity {
 
@@ -18,10 +19,14 @@ public class ExperienceListActivity extends BaseActivity {
     private int resumeId;
     private Resume resume;
     private List<ExperienceEntry> entries = new ArrayList<>();
+    private final List<String> firestoreIds = new ArrayList<>();
     private ExperienceListAdapter adapter;
 
     private RecyclerView rv;
     private TextView emptyView;
+
+    private UserProfileManager profileManager;
+    private boolean isProfileMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,9 +35,11 @@ public class ExperienceListActivity extends BaseActivity {
 
         db = AppDatabase.getInstance(this);
         resumeId = getIntent().getIntExtra("RESUME_ID", -1);
+        isProfileMode = (resumeId == ProfileActivity.PROFILE_RESUME_ID);
+        profileManager = new UserProfileManager();
 
         findViewById(R.id.backBtn).setOnClickListener(v -> finish());
-        findViewById(R.id.btnAddEntry).setOnClickListener(v -> openEditor(-1));
+        findViewById(R.id.btnAddEntry).setOnClickListener(v -> openEditor(-1, null));
 
         rv = findViewById(R.id.rvEntries);
         emptyView = findViewById(R.id.emptyView);
@@ -41,7 +48,9 @@ public class ExperienceListActivity extends BaseActivity {
         adapter = new ExperienceListAdapter(entries, new ExperienceListAdapter.Listener() {
             @Override
             public void onEntryClick(int position) {
-                openEditor(position);
+                String fsId = (isProfileMode && position < firestoreIds.size())
+                        ? firestoreIds.get(position) : null;
+                openEditor(position, fsId);
             }
             @Override
             public void onEntryDelete(int position) {
@@ -58,6 +67,7 @@ public class ExperienceListActivity extends BaseActivity {
     }
 
     private void reload() {
+        if (isProfileMode) { reloadFromFirestore(); return; }
         if (resumeId == -1) return;
         new Thread(() -> {
             resume = db.resumeDao().getResumeById(resumeId);
@@ -73,10 +83,30 @@ public class ExperienceListActivity extends BaseActivity {
         }).start();
     }
 
-    private void openEditor(int index) {
+    private void reloadFromFirestore() {
+        profileManager.loadExperience(list -> runOnUiThread(() -> {
+            entries.clear();
+            firestoreIds.clear();
+            for (Map<String, Object> e : list) {
+                ExperienceEntry entry = new ExperienceEntry();
+                entry.expOrgName  = getStr(e, UserProfileManager.EXP_ORG);
+                entry.expPosition = getStr(e, UserProfileManager.EXP_POS);
+                entry.expLocation = getStr(e, UserProfileManager.EXP_LOC);
+                entry.expDate     = getStr(e, UserProfileManager.EXP_DATE);
+                entry.expBullets  = getStr(e, UserProfileManager.EXP_BULLETS);
+                entries.add(entry);
+                firestoreIds.add(getStr(e, UserProfileManager.EXP_ID));
+            }
+            adapter.notifyDataSetChanged();
+            emptyView.setVisibility(entries.isEmpty() ? View.VISIBLE : View.GONE);
+        }), err -> {});
+    }
+
+    private void openEditor(int index, String firestoreId) {
         Intent i = new Intent(this, ExperienceActivity.class);
         i.putExtra("RESUME_ID", resumeId);
         i.putExtra(ExperienceActivity.EXTRA_ENTRY_INDEX, index);
+        if (firestoreId != null) i.putExtra(ExperienceActivity.EXTRA_FIRESTORE_ID, firestoreId);
         startActivity(i);
     }
 
@@ -92,12 +122,29 @@ public class ExperienceListActivity extends BaseActivity {
     }
 
     private void performDelete(int position) {
-        if (resume == null || position < 0 || position >= entries.size()) return;
+        if (position < 0 || position >= entries.size()) return;
+        if (isProfileMode) {
+            String fsId = position < firestoreIds.size() ? firestoreIds.get(position) : null;
+            if (fsId != null) {
+                profileManager.deleteExperienceEntry(fsId, () -> {}, err -> {});
+            }
+            entries.remove(position);
+            firestoreIds.remove(position);
+            adapter.notifyItemRemoved(position);
+            emptyView.setVisibility(entries.isEmpty() ? View.VISIBLE : View.GONE);
+            return;
+        }
+        if (resume == null) return;
         entries.remove(position);
         adapter.notifyItemRemoved(position);
         emptyView.setVisibility(entries.isEmpty() ? View.VISIBLE : View.GONE);
 
         resume.setExperienceJson(ResumeEntries.serializeExperience(entries));
         new Thread(() -> db.resumeDao().update(resume)).start();
+    }
+
+    private String getStr(Map<String, Object> map, String key) {
+        Object v = map.get(key);
+        return v != null ? v.toString() : "";
     }
 }

@@ -11,10 +11,12 @@ import com.google.android.material.textfield.TextInputEditText;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class ExperienceActivity extends BaseActivity {
 
-    public static final String EXTRA_ENTRY_INDEX = "ENTRY_INDEX";
+    public static final String EXTRA_ENTRY_INDEX   = "ENTRY_INDEX";
+    public static final String EXTRA_FIRESTORE_ID  = "ENTRY_FIRESTORE_ID";
 
     private TextInputEditText editOrg, editPos, editLoc, editDate;
     private RecyclerView rvBullets;
@@ -26,6 +28,10 @@ public class ExperienceActivity extends BaseActivity {
     private Resume resume;
     private List<ExperienceEntry> entries = new ArrayList<>();
 
+    private UserProfileManager profileManager;
+    private boolean isProfileMode;
+    private String firestoreEntryId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,6 +41,9 @@ public class ExperienceActivity extends BaseActivity {
         db = AppDatabase.getInstance(this);
         resumeId = getIntent().getIntExtra("RESUME_ID", -1);
         entryIndex = getIntent().getIntExtra(EXTRA_ENTRY_INDEX, -1);
+        firestoreEntryId = getIntent().getStringExtra(EXTRA_FIRESTORE_ID);
+        isProfileMode = (resumeId == ProfileActivity.PROFILE_RESUME_ID);
+        profileManager = new UserProfileManager();
 
         // 2. Bind Views
         editOrg = findViewById(R.id.editOrgName);
@@ -61,6 +70,63 @@ public class ExperienceActivity extends BaseActivity {
         loadData();
     }
 
+    private void loadProfileExperience() {
+        if (firestoreEntryId == null || firestoreEntryId.isEmpty()) {
+            if (bulletList.isEmpty()) bulletList.add("");
+            adapter = new BulletAdapter(bulletList);
+            rvBullets.setAdapter(adapter);
+            return;
+        }
+        profileManager.loadExperience(list -> runOnUiThread(() -> {
+            for (Map<String, Object> e : list) {
+                if (firestoreEntryId.equals(e.get(UserProfileManager.EXP_ID))) {
+                    editOrg.setText(getStr(e, UserProfileManager.EXP_ORG));
+                    editPos.setText(getStr(e, UserProfileManager.EXP_POS));
+                    editLoc.setText(getStr(e, UserProfileManager.EXP_LOC));
+                    editDate.setText(getStr(e, UserProfileManager.EXP_DATE));
+                    String bulls = getStr(e, UserProfileManager.EXP_BULLETS);
+                    if (!bulls.isEmpty()) {
+                        bulletList.addAll(Arrays.asList(bulls.split("\\|")));
+                    }
+                    break;
+                }
+            }
+            if (bulletList.isEmpty()) bulletList.add("");
+            adapter = new BulletAdapter(bulletList);
+            rvBullets.setAdapter(adapter);
+        }), err -> runOnUiThread(() -> {
+            if (bulletList.isEmpty()) bulletList.add("");
+            adapter = new BulletAdapter(bulletList);
+            rvBullets.setAdapter(adapter);
+        }));
+    }
+
+    private void saveProfileExperience() {
+        String org  = editOrg.getText()  != null ? editOrg.getText().toString()  : "";
+        String pos  = editPos.getText()  != null ? editPos.getText().toString()  : "";
+        String loc  = editLoc.getText()  != null ? editLoc.getText().toString()  : "";
+        String date = editDate.getText() != null ? editDate.getText().toString() : "";
+        StringBuilder sb = new StringBuilder();
+        if (adapter != null) {
+            for (String s : adapter.getBullets()) {
+                if (s != null && !s.trim().isEmpty()) sb.append(s).append("|");
+            }
+        }
+        profileManager.saveExperienceEntry(
+                firestoreEntryId, org, pos, loc, date, sb.toString(),
+                () -> runOnUiThread(() -> {
+                    Toast.makeText(this, "Experience Saved!", Toast.LENGTH_SHORT).show();
+                    finish();
+                }),
+                err -> runOnUiThread(() ->
+                        Toast.makeText(this, "Save failed: " + err, Toast.LENGTH_SHORT).show()));
+    }
+
+    private String getStr(Map<String, Object> map, String key) {
+        Object v = map.get(key);
+        return v != null ? v.toString() : "";
+    }
+
     /**
      * Displays a BottomSheet with professional writing tips for the Experience section.
      */
@@ -82,6 +148,7 @@ public class ExperienceActivity extends BaseActivity {
     }
 
     private void loadData() {
+        if (isProfileMode) { loadProfileExperience(); return; }
         if (resumeId == -1) return;
 
         new Thread(() -> {
@@ -112,6 +179,7 @@ public class ExperienceActivity extends BaseActivity {
     }
 
     private void saveExperience() {
+        if (isProfileMode) { saveProfileExperience(); return; }
         if (resume == null) return;
 
         String org = editOrg.getText() != null ? editOrg.getText().toString() : "";

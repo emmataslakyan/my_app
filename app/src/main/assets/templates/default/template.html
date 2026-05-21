@@ -15,7 +15,9 @@
     background: #fff;
   }
   .resume { max-width: 800px; margin: 0 auto; padding: 24px; }
-  header { text-align: center; border-bottom: 2px solid #432676; padding-bottom: 12px; margin-bottom: 18px; }
+  header { display: flex; align-items: center; gap: 20px; border-bottom: 2px solid #432676; padding-bottom: 12px; margin-bottom: 18px; }
+  .header-photo { width: 88px; height: 88px; border-radius: 50%; object-fit: cover; border: 3px solid #432676; flex-shrink: 0; }
+  .header-info { flex: 1; text-align: center; }
   header h1 { margin: 0; font-size: 24pt; letter-spacing: 1px; color: #432676; }
   header .title { font-size: 12pt; color: #5a5a5a; margin-top: 4px; }
   header .contact { font-size: 10pt; color: #444; margin-top: 6px; }
@@ -44,12 +46,15 @@
 <div class="resume">
 
   <header>
-    <h1>{{name}}</h1>
-    {{#title}}<div class="title">{{title}}</div>{{/title}}
-    <div class="contact">
-      {{#address}}<span>{{address}}</span>{{/address}}
-      {{#email}}<span>{{email}}</span>{{/email}}
-      {{#phone}}<span>{{phone}}</span>{{/phone}}
+    {{#hasPhoto}}<img class="header-photo" src="{{{photoPath}}}" alt="Profile photo">{{/hasPhoto}}
+    <div class="header-info">
+      <h1>{{name}}</h1>
+      {{#title}}<div class="title">{{title}}</div>{{/title}}
+      <div class="contact">
+        {{#address}}<span>{{address}}</span>{{/address}}
+        {{#email}}<span>{{email}}</span>{{/email}}
+        {{#phone}}<span>{{phone}}</span>{{/phone}}
+      </div>
     </div>
   </header>
 

@@ -473,7 +473,7 @@
                 android:layout_marginBottom="28dp"
                 android:baselineAligned="false"
                 android:orientation="horizontal"
-                android:weightSum="3">
+                android:weightSum="4">
 
 
                 <com.google.android.material.card.MaterialCardView
@@ -617,6 +617,46 @@
 
                 </com.google.android.material.card.MaterialCardView>
 
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/tile_img_to_pdf"
+                    android:layout_width="0dp"
+                    android:layout_height="90dp"
+                    android:layout_marginStart="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/glass_card"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    app:cardBackgroundColor="@android:color/transparent"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="8dp">
+
+                        <ImageView
+                            android:layout_width="25dp"
+                            android:layout_height="25dp"
+                            android:contentDescription="Image to PDF"
+                            android:src="@drawable/convert"
+                            android:background="@drawable/glass_card"
+                            app:tint="#46287A" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:gravity="center"
+                            android:text="Img→PDF"
+                            android:textColor="#051256"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+
+                </com.google.android.material.card.MaterialCardView>
 
             </LinearLayout>
 

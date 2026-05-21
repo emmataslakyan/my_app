@@ -19,8 +19,9 @@ public final class ResumeDataMapper {
         ctx.put("email", nz(r.getEmail()));
         ctx.put("phone", nz(r.getPhone()));
         ctx.put("address", nz(r.getAddress()));
-        ctx.put("photoPath", photoUri(r.getPhotoPath()));
-        ctx.put("hasPhoto", !nz(r.getPhotoPath()).isEmpty());
+        String photoData = photoData(r.getPhotoPath());
+        ctx.put("photoPath", photoData);
+        ctx.put("hasPhoto", !photoData.isEmpty());
 
         // Education
         List<Map<String, Object>> education = new ArrayList<>();
@@ -89,14 +90,25 @@ public final class ResumeDataMapper {
         return ctx;
     }
 
-    private static String photoUri(String path) {
+    private static String photoData(String path) {
         String p = nz(path);
         if (p.isEmpty()) return "";
-        if (p.startsWith("file://") || p.startsWith("http://") || p.startsWith("https://")
-                || p.startsWith("content://") || p.startsWith("data:")) {
-            return p;
+        if (p.startsWith("data:")) return p;
+        if (p.startsWith("http://") || p.startsWith("https://")) return p;
+        String filePath = p.startsWith("file://") ? p.substring(7) : p;
+        java.io.File file = new java.io.File(filePath);
+        if (!file.exists()) return "";
+        try (java.io.InputStream in = new java.io.FileInputStream(file)) {
+            java.io.ByteArrayOutputStream buf = new java.io.ByteArrayOutputStream();
+            byte[] tmp = new byte[4096];
+            int n;
+            while ((n = in.read(tmp)) != -1) buf.write(tmp, 0, n);
+            String mime = filePath.endsWith(".png") ? "image/png" : "image/jpeg";
+            return "data:" + mime + ";base64,"
+                    + android.util.Base64.encodeToString(buf.toByteArray(), android.util.Base64.NO_WRAP);
+        } catch (Exception e) {
+            return "";
         }
-        return "file://" + p;
     }
 
     private static List<String> splitCsv(String raw) {

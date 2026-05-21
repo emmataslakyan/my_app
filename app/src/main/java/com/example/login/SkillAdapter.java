@@ -53,7 +53,9 @@ public class SkillAdapter extends RecyclerView.Adapter<SkillAdapter.SkillViewHol
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                skillsList.set(holder.getAdapterPosition(), s.toString() + ":" + holder.autoCompleteLevel.getText().toString());
+                int pos = holder.getAdapterPosition();
+                if (pos != RecyclerView.NO_POSITION)
+                    skillsList.set(pos, s.toString() + ":" + holder.autoCompleteLevel.getText().toString());
             }
             @Override
             public void afterTextChanged(Editable s) {}

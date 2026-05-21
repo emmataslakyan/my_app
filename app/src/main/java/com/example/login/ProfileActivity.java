@@ -28,7 +28,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -43,8 +42,14 @@ public class ProfileActivity extends BaseActivity {
     private FirebaseAuth mAuth;
     private UserProfileManager profileManager;
     private LinearLayout containerEducation;
+    private LinearLayout containerExperience;
+    private LinearLayout containerSkills;
+    private LinearLayout containerLanguages;
     private LinearLayout containerDocuments;
     private TextView tvEduEmpty;
+    private TextView tvExpEmpty;
+    private TextView tvSkillsEmpty;
+    private TextView tvLanguagesEmpty;
     private TextView tvDocsEmpty;
     private ImageView profileAvatar;
 
@@ -71,16 +76,25 @@ public class ProfileActivity extends BaseActivity {
         loadProfileHeader();
         loadPersonalInfoSummary();
         loadEducationSection();
+        loadExperienceSection();
+        loadSkillsSection();
+        loadLanguagesSection();
         loadDocumentsSection();
         loadProfilePhoto();
     }
 
     private void bindViews() {
-        containerEducation = findViewById(R.id.container_education);
-        containerDocuments = findViewById(R.id.container_documents);
-        tvEduEmpty         = findViewById(R.id.tv_edu_empty);
-        tvDocsEmpty        = findViewById(R.id.tv_docs_empty);
-        profileAvatar      = findViewById(R.id.profile_avatar);
+        containerEducation  = findViewById(R.id.container_education);
+        containerExperience = findViewById(R.id.container_experience);
+        containerSkills     = findViewById(R.id.container_skills);
+        containerLanguages  = findViewById(R.id.container_languages);
+        containerDocuments  = findViewById(R.id.container_documents);
+        tvEduEmpty          = findViewById(R.id.tv_edu_empty);
+        tvExpEmpty          = findViewById(R.id.tv_exp_empty);
+        tvSkillsEmpty       = findViewById(R.id.tv_skills_empty);
+        tvLanguagesEmpty    = findViewById(R.id.tv_languages_empty);
+        tvDocsEmpty         = findViewById(R.id.tv_docs_empty);
+        profileAvatar       = findViewById(R.id.profile_avatar);
     }
 
     private void setupToolbar() {
@@ -114,9 +128,33 @@ public class ProfileActivity extends BaseActivity {
                 startActivity(i);
             });
 
+        ImageButton btnEditExp = findViewById(R.id.btn_edit_experience);
+        if (btnEditExp != null)
+            btnEditExp.setOnClickListener(v -> {
+                Intent i = new Intent(this, ExperienceListActivity.class);
+                i.putExtra("RESUME_ID", PROFILE_RESUME_ID);
+                startActivity(i);
+            });
+
+        ImageButton btnEditSkills = findViewById(R.id.btn_edit_skills);
+        if (btnEditSkills != null)
+            btnEditSkills.setOnClickListener(v -> {
+                Intent i = new Intent(this, SkillsActivity.class);
+                i.putExtra("RESUME_ID", PROFILE_RESUME_ID);
+                startActivity(i);
+            });
+
+        ImageButton btnEditLanguages = findViewById(R.id.btn_edit_languages);
+        if (btnEditLanguages != null)
+            btnEditLanguages.setOnClickListener(v -> {
+                Intent i = new Intent(this, LanguagesActivity.class);
+                i.putExtra("RESUME_ID", PROFILE_RESUME_ID);
+                startActivity(i);
+            });
+
         ImageButton btnUpload = findViewById(R.id.btn_upload_document);
         if (btnUpload != null)
-            btnUpload.setOnClickListener(v -> documentPickerLauncher.launch("*/*"));
+            btnUpload.setOnClickListener(v -> documentPickerLauncher.launch("application/pdf"));
 
         if (profileAvatar != null)
             profileAvatar.setOnClickListener(v -> photoPickerLauncher.launch("image/*"));
@@ -146,44 +184,59 @@ public class ProfileActivity extends BaseActivity {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user == null) { toast("Not signed in"); return; }
 
-        final String fileName = getFileName(fileUri);
-        final String mimeType = getContentResolver().getType(fileUri);
-        final String type = (mimeType != null && mimeType.contains("pdf")) ? "pdf" : "file";
+        String raw = getFileName(fileUri);
+        final String fileName = (raw != null && !raw.isEmpty())
+                ? raw : "certificate_" + System.currentTimeMillis() + ".pdf";
 
-        byte[] fileBytes = readBytesFromUri(fileUri);
-        if (fileBytes == null) {
-            toast("Could not read the file.");
+        final String mimeType = getContentResolver().getType(fileUri);
+        final String storageName = System.currentTimeMillis() + "_" + fileName;
+
+        java.io.InputStream stream;
+        try {
+            stream = getContentResolver().openInputStream(fileUri);
+        } catch (Exception e) {
+            toast("Could not open file.");
             return;
         }
+        if (stream == null) { toast("Could not read the file."); return; }
 
         StorageMetadata metadata = new StorageMetadata.Builder()
-                .setContentType(mimeType)
+                .setContentType(mimeType != null ? mimeType : "application/pdf")
                 .setCustomMetadata("originalName", fileName)
                 .build();
 
         StorageReference storageRef = FirebaseStorage.getInstance()
-                .getReference("users/" + user.getUid() + "/documents/" + fileName);
+                .getReference("users/" + user.getUid() + "/documents/" + storageName);
 
         toast("Uploading " + fileName + "...");
 
-        storageRef.putBytes(fileBytes, metadata)
+        storageRef.putStream(stream, metadata)
                 .addOnSuccessListener(taskSnapshot ->
                         storageRef.getDownloadUrl().addOnSuccessListener(downloadUri -> {
                             Log.d(TAG, "Upload success: " + downloadUri);
                             profileManager.saveDocumentEntry(
                                     fileName,
                                     downloadUri.toString(),
-                                    type,
+                                    "pdf",
                                     () -> runOnUiThread(() -> {
-                                        toast("Document saved!");
+                                        toast("Certificate saved!");
                                         loadDocumentsSection();
                                     }),
-                                    err -> toast("Metadata sync failed: " + err));
+                                    err -> runOnUiThread(() -> toast("Save failed: " + err)));
                         }))
                 .addOnFailureListener(e -> {
-                    Log.e(TAG, "Firebase Upload Error", e);
-                    toast("Upload failed: " + e.getLocalizedMessage());
+                    Log.e(TAG, "Upload failed", e);
+                    runOnUiThread(() -> toast("Upload failed: " + e.getLocalizedMessage()));
                 });
+    }
+
+    private void deleteDocument(String docId) {
+        profileManager.deleteDocumentEntry(docId,
+                () -> runOnUiThread(() -> {
+                    toast("Certificate removed.");
+                    loadDocumentsSection();
+                }),
+                err -> runOnUiThread(() -> toast("Delete failed: " + err)));
     }
 
     private String getFileName(Uri uri) {
@@ -206,20 +259,6 @@ public class ProfileActivity extends BaseActivity {
         return result;
     }
 
-    private byte[] readBytesFromUri(Uri uri) {
-        try (InputStream in = getContentResolver().openInputStream(uri)) {
-            if (in == null) return null;
-            ByteArrayOutputStream buf = new ByteArrayOutputStream();
-            byte[] tmp = new byte[4096];
-            int n;
-            while ((n = in.read(tmp)) != -1) buf.write(tmp, 0, n);
-            return buf.toByteArray();
-        } catch (Exception e) {
-            Log.e(TAG, "readBytesFromUri failed", e);
-            return null;
-        }
-    }
-
     // ── Profile Photo Logic ──────────────────────────────────────────────────
 
     private void handleProfilePhotoSelected(Uri uri) {
@@ -231,14 +270,12 @@ public class ProfileActivity extends BaseActivity {
         }
 
         FirebaseUser user = mAuth.getCurrentUser();
-        if (user == null) return;
-        byte[] bytes = readBytesFromUri(uri);
-        if (bytes == null) return;
+        if (user == null || path == null) return;
 
         StorageReference ref = FirebaseStorage.getInstance()
                 .getReference("users/" + user.getUid() + "/profile_photo.jpg");
 
-        ref.putBytes(bytes)
+        ref.putFile(Uri.fromFile(new File(path)))
                 .addOnSuccessListener(snap ->
                         ref.getDownloadUrl().addOnSuccessListener(downloadUri ->
                                 profileManager.savePhotoUrl(
@@ -296,7 +333,12 @@ public class ProfileActivity extends BaseActivity {
 
     private void loadPersonalInfoSummary() {
         profileManager.loadProfile(data -> runOnUiThread(() -> {
-            setFieldText(R.id.tv_name,       getStr(data, UserProfileManager.KEY_FULL_NAME));
+            String fullName = getStr(data, UserProfileManager.KEY_FULL_NAME);
+            if (!fullName.isEmpty()) {
+                TextView tvUsername = findViewById(R.id.profile_username);
+                if (tvUsername != null) tvUsername.setText(fullName);
+            }
+            setFieldText(R.id.tv_name,       fullName);
             setFieldText(R.id.tv_email_info, getStr(data, UserProfileManager.KEY_EMAIL));
             setFieldText(R.id.tv_phone,      getStr(data, UserProfileManager.KEY_PHONE));
             setFieldText(R.id.tv_address,    getStr(data, UserProfileManager.KEY_ADDRESS));
@@ -326,6 +368,142 @@ public class ProfileActivity extends BaseActivity {
         }), err -> Log.e(TAG, "Load education error: " + err));
     }
 
+    private void loadExperienceSection() {
+        profileManager.loadExperience(list -> runOnUiThread(() -> {
+            containerExperience.removeAllViews();
+            tvExpEmpty.setVisibility(list.isEmpty() ? View.VISIBLE : View.GONE);
+            for (Map<String, Object> entry : list) {
+                containerExperience.addView(buildExperienceRow(entry));
+            }
+        }), err -> Log.e(TAG, "Load experience error: " + err));
+    }
+
+    private void loadSkillsSection() {
+        profileManager.loadProfile(data -> runOnUiThread(() -> {
+            containerSkills.removeAllViews();
+            Object v = data.get(UserProfileManager.KEY_SKILLS);
+            String stored = v != null ? v.toString() : "";
+            if (stored.isEmpty()) {
+                tvSkillsEmpty.setVisibility(View.VISIBLE);
+                return;
+            }
+            tvSkillsEmpty.setVisibility(View.GONE);
+            for (String skillEntry : stored.split("\\|")) {
+                if (skillEntry.trim().isEmpty()) continue;
+                containerSkills.addView(buildSkillRow(skillEntry));
+            }
+        }), err -> Log.e(TAG, "Load skills error: " + err));
+    }
+
+    private View buildExperienceRow(Map<String, Object> entry) {
+        LinearLayout card = new LinearLayout(this);
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setPadding(0, 0, 0, dpToPx(12));
+
+        String org  = getStr(entry, UserProfileManager.EXP_ORG);
+        String pos  = getStr(entry, UserProfileManager.EXP_POS);
+        String date = getStr(entry, UserProfileManager.EXP_DATE);
+
+        TextView tvOrg = new TextView(this);
+        tvOrg.setText(org.isEmpty() ? "—" : org);
+        tvOrg.setTextColor(0xFF444444);
+        tvOrg.setTextSize(14);
+        card.addView(tvOrg);
+
+        if (!pos.isEmpty()) {
+            TextView tvPos = new TextView(this);
+            tvPos.setText(pos);
+            tvPos.setTextColor(0xFF666666);
+            tvPos.setTextSize(13);
+            card.addView(tvPos);
+        }
+
+        if (!date.isEmpty()) {
+            TextView tvDate = new TextView(this);
+            tvDate.setText(date);
+            tvDate.setTextColor(0xFF888888);
+            tvDate.setTextSize(12);
+            card.addView(tvDate);
+        }
+
+        return card;
+    }
+
+    private void loadLanguagesSection() {
+        profileManager.loadProfile(data -> runOnUiThread(() -> {
+            containerLanguages.removeAllViews();
+            Object v = data.get(UserProfileManager.KEY_LANGUAGES);
+            String stored = v != null ? v.toString() : "";
+            if (stored.isEmpty()) {
+                tvLanguagesEmpty.setVisibility(View.VISIBLE);
+                return;
+            }
+            tvLanguagesEmpty.setVisibility(View.GONE);
+            for (String langEntry : stored.split("\\|")) {
+                if (langEntry.trim().isEmpty()) continue;
+                containerLanguages.addView(buildLanguageRow(langEntry));
+            }
+        }), err -> Log.e(TAG, "Load languages error: " + err));
+    }
+
+    private View buildLanguageRow(String langEntry) {
+        String[] parts = langEntry.split(":", 2);
+        String name  = parts.length > 0 ? parts[0].trim() : langEntry;
+        String level = parts.length > 1 ? parts[1].trim() : "";
+
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setPadding(0, 0, 0, dpToPx(6));
+
+        TextView tvName = new TextView(this);
+        tvName.setText(name);
+        tvName.setTextColor(0xFF444444);
+        tvName.setTextSize(14);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0,
+                LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+        tvName.setLayoutParams(lp);
+        row.addView(tvName);
+
+        if (!level.isEmpty()) {
+            TextView tvLevel = new TextView(this);
+            tvLevel.setText(level);
+            tvLevel.setTextColor(0xFF888888);
+            tvLevel.setTextSize(12);
+            row.addView(tvLevel);
+        }
+
+        return row;
+    }
+
+    private View buildSkillRow(String skillEntry) {
+        String[] parts = skillEntry.split(":", 2);
+        String name  = parts.length > 0 ? parts[0].trim() : skillEntry;
+        String level = parts.length > 1 ? parts[1].trim() : "";
+
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setPadding(0, 0, 0, dpToPx(6));
+
+        TextView tvName = new TextView(this);
+        tvName.setText(name);
+        tvName.setTextColor(0xFF444444);
+        tvName.setTextSize(14);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0,
+                LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+        tvName.setLayoutParams(lp);
+        row.addView(tvName);
+
+        if (!level.isEmpty()) {
+            TextView tvLevel = new TextView(this);
+            tvLevel.setText(level);
+            tvLevel.setTextColor(0xFF888888);
+            tvLevel.setTextSize(12);
+            row.addView(tvLevel);
+        }
+
+        return row;
+    }
+
     private void loadDocumentsSection() {
         profileManager.loadDocuments(list -> runOnUiThread(() -> {
             containerDocuments.removeAllViews();
@@ -339,12 +517,17 @@ public class ProfileActivity extends BaseActivity {
     private View buildDocumentRow(Map<String, Object> entry) {
         View row = LayoutInflater.from(this).inflate(R.layout.item_document_row, containerDocuments, false);
         TextView tvName = row.findViewById(R.id.tv_doc_name);
-        String name = getStr(entry, "name");
-        tvName.setText(name);
+        String name  = getStr(entry, "name");
+        String docId = getStr(entry, UserProfileManager.DOC_ID);
+        tvName.setText(name.isEmpty() ? "Certificate" : name);
         row.setOnClickListener(v -> {
             String url = getStr(entry, "url");
             if (!url.isEmpty()) startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
         });
+        android.widget.ImageButton btnDel = row.findViewById(R.id.btn_doc_delete);
+        if (btnDel != null && !docId.isEmpty()) {
+            btnDel.setOnClickListener(v -> deleteDocument(docId));
+        }
         return row;
     }
 

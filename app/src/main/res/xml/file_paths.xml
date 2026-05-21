@@ -7,4 +7,12 @@
     <external-files-path
         name="my_downloads"
         path="Download" />
+
+    <cache-path
+        name="cached_files"
+        path="." />
+
+    <files-path
+        name="internal_files"
+        path="." />
 </paths>
