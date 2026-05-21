@@ -22,8 +22,8 @@ public class ExperienceActivity extends BaseActivity {
     private RecyclerView rvBullets;
     private BulletAdapter adapter;
     private final List<String> bulletList = new ArrayList<>();
-    private AppDatabase db;
-    private int resumeId;
+    private ResumeRepository repo;
+    private String resumeId;
     private int entryIndex = -1;
     private Resume resume;
     private List<ExperienceEntry> entries = new ArrayList<>();
@@ -37,12 +37,11 @@ public class ExperienceActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_experience);
 
-        // 1. Initialize Database and Data
-        db = AppDatabase.getInstance(this);
-        resumeId = getIntent().getIntExtra("RESUME_ID", -1);
+        repo = new ResumeRepository();
+        resumeId = getIntent().getStringExtra("RESUME_ID");
         entryIndex = getIntent().getIntExtra(EXTRA_ENTRY_INDEX, -1);
         firestoreEntryId = getIntent().getStringExtra(EXTRA_FIRESTORE_ID);
-        isProfileMode = (resumeId == ProfileActivity.PROFILE_RESUME_ID);
+        isProfileMode = ProfileActivity.PROFILE_RESUME_ID.equals(resumeId);
         profileManager = new UserProfileManager();
 
         // 2. Bind Views
@@ -149,12 +148,11 @@ public class ExperienceActivity extends BaseActivity {
 
     private void loadData() {
         if (isProfileMode) { loadProfileExperience(); return; }
-        if (resumeId == -1) return;
+        if (resumeId == null || resumeId.isEmpty()) return;
 
-        new Thread(() -> {
-            resume = db.resumeDao().getResumeById(resumeId);
-            if (resume == null) return;
-            entries = ResumeEntries.parseExperience(resume.getExperienceJson());
+        repo.get(resumeId, r -> {
+            resume = r;
+            entries = ResumeEntries.parseExperience(r.getExperienceJson());
 
             ExperienceEntry entry = (entryIndex >= 0 && entryIndex < entries.size())
                     ? entries.get(entryIndex) : new ExperienceEntry();
@@ -166,16 +164,14 @@ public class ExperienceActivity extends BaseActivity {
                 bulletList.add("");
             }
 
-            runOnUiThread(() -> {
-                editOrg.setText(entry.expOrgName);
-                editPos.setText(entry.expPosition);
-                editLoc.setText(entry.expLocation);
-                editDate.setText(entry.expDate);
+            editOrg.setText(entry.expOrgName);
+            editPos.setText(entry.expPosition);
+            editLoc.setText(entry.expLocation);
+            editDate.setText(entry.expDate);
 
-                adapter = new BulletAdapter(bulletList);
-                rvBullets.setAdapter(adapter);
-            });
-        }).start();
+            adapter = new BulletAdapter(bulletList);
+            rvBullets.setAdapter(adapter);
+        }, err -> Toast.makeText(this, "Couldn't load resume: " + err, Toast.LENGTH_SHORT).show());
     }
 
     private void saveExperience() {
@@ -211,12 +207,11 @@ public class ExperienceActivity extends BaseActivity {
         }
         resume.setExperienceJson(ResumeEntries.serializeExperience(entries));
 
-        new Thread(() -> {
-            db.resumeDao().update(resume);
-            runOnUiThread(() -> {
-                Toast.makeText(this, "Experience Saved!", Toast.LENGTH_SHORT).show();
-                finish();
-            });
-        }).start();
+        repo.update(resume,
+                () -> {
+                    Toast.makeText(this, "Experience Saved!", Toast.LENGTH_SHORT).show();
+                    finish();
+                },
+                err -> Toast.makeText(this, "Save failed: " + err, Toast.LENGTH_SHORT).show());
     }
 }

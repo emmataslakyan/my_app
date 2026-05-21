@@ -37,6 +37,7 @@ public final class ResumeDataMapper {
             education.add(e);
         }
         ctx.put("education", education);
+        ctx.put("hasEducation", !education.isEmpty());
 
         // Experience
         List<Map<String, Object>> experience = new ArrayList<>();
@@ -51,6 +52,7 @@ public final class ResumeDataMapper {
             experience.add(x);
         }
         ctx.put("experience", experience);
+        ctx.put("hasExperience", !experience.isEmpty());
 
         // Volunteering
         List<Map<String, Object>> volunteering = new ArrayList<>();

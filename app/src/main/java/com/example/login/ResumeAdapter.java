@@ -17,12 +17,18 @@ import java.util.List;
 
 public class ResumeAdapter extends RecyclerView.Adapter<ResumeAdapter.ViewHolder> {
 
-    private final List<Resume> resumes;
-    private final AppDatabase db;
+    public interface Listener {
+        void onResumeChanged();
+    }
 
-    public ResumeAdapter(List<Resume> resumes, AppDatabase db) {
+    private final List<Resume> resumes;
+    private final ResumeRepository repo;
+    private final Listener listener;
+
+    public ResumeAdapter(List<Resume> resumes, ResumeRepository repo, Listener listener) {
         this.resumes = resumes;
-        this.db = db;
+        this.repo = repo;
+        this.listener = listener;
     }
 
     @NonNull
@@ -38,8 +44,6 @@ public class ResumeAdapter extends RecyclerView.Adapter<ResumeAdapter.ViewHolder
         Resume resume = resumes.get(position);
         Context context = holder.itemView.getContext();
 
-        // Bind data to XML views
-        // Use getName() if available, otherwise title
         String displayName = (resume.getName() != null && !resume.getName().isEmpty())
                 ? resume.getName() : resume.getTitle();
 
@@ -53,12 +57,8 @@ public class ResumeAdapter extends RecyclerView.Adapter<ResumeAdapter.ViewHolder
             context.startActivity(intent);
         });
         holder.viewBtn.setOnClickListener(v -> {
-            // Use TemplateSelectionActivity (the class you provided)
             Intent intent = new Intent(context, TemplateSelectionActivity.class);
-
-            // Pass the resume ID so the template page knows which resume we are working with
             intent.putExtra("RESUME_ID", resume.getId());
-
             context.startActivity(intent);
         });
         holder.menuMore.setOnClickListener(v -> {
@@ -68,35 +68,41 @@ public class ResumeAdapter extends RecyclerView.Adapter<ResumeAdapter.ViewHolder
 
             popup.setOnMenuItemClickListener(item -> {
                 int currentPos = holder.getAdapterPosition();
-                if (item.getItemId() == 1) { // DELETE
-                    new Thread(() -> {
-                        db.resumeDao().delete(resume);
-                        ((Activity) context).runOnUiThread(() -> {
-                            resumes.remove(currentPos);
-                            notifyItemRemoved(currentPos);
-                        });
-                    }).start();
-                } else if (item.getItemId() == 0) { // DUPLICATE
-                    new Thread(() -> {
-                        // Create a copy of the current resume
-                        Resume duplicate = new Resume();
-                        duplicate.setTitle(resume.getTitle() + " (Copy)");
-                        duplicate.setName(resume.getName());
-                        duplicate.setEmail(resume.getEmail());
-                        duplicate.setDate("Copied: " + java.text.DateFormat.getDateInstance().format(new java.util.Date()));
+                if (currentPos == RecyclerView.NO_POSITION) return true;
+                if (item.getItemId() == 1) {
+                    repo.delete(resume.getId(),
+                            () -> ((Activity) context).runOnUiThread(() -> {
+                                int idx = resumes.indexOf(resume);
+                                if (idx >= 0) {
+                                    resumes.remove(idx);
+                                    notifyItemRemoved(idx);
+                                }
+                            }),
+                            err -> ((Activity) context).runOnUiThread(() ->
+                                    Toast.makeText(context, "Delete failed: " + err, Toast.LENGTH_SHORT).show()));
+                } else if (item.getItemId() == 0) {
+                    Resume duplicate = new Resume();
+                    duplicate.setTitle((resume.getTitle() == null ? "" : resume.getTitle()) + " (Copy)");
+                    duplicate.setName(resume.getName());
+                    duplicate.setEmail(resume.getEmail());
+                    duplicate.setPhone(resume.getPhone());
+                    duplicate.setAddress(resume.getAddress());
+                    duplicate.setPhotoPath(resume.getPhotoPath());
+                    duplicate.setTemplateId(resume.getTemplateId());
+                    duplicate.setEducationJson(resume.getEducationJson());
+                    duplicate.setExperienceJson(resume.getExperienceJson());
+                    duplicate.setSkills(resume.getSkills());
+                    duplicate.setLanguages(resume.getLanguages());
+                    duplicate.setDate("Copied: " +
+                            java.text.DateFormat.getDateInstance().format(new java.util.Date()));
 
-                        db.resumeDao().insert(duplicate);
-
-                        // Refresh the full list from DB to show the new item
-                        List<Resume> updatedList = db.resumeDao().getAllResumes();
-
-                        ((Activity) context).runOnUiThread(() -> {
-                            resumes.clear();
-                            resumes.addAll(updatedList);
-                            notifyDataSetChanged();
-                            Toast.makeText(context, "Resume Duplicated", Toast.LENGTH_SHORT).show();
-                        });
-                    }).start();
+                    repo.create(duplicate,
+                            id -> ((Activity) context).runOnUiThread(() -> {
+                                Toast.makeText(context, "Resume Duplicated", Toast.LENGTH_SHORT).show();
+                                if (listener != null) listener.onResumeChanged();
+                            }),
+                            err -> ((Activity) context).runOnUiThread(() ->
+                                    Toast.makeText(context, "Duplicate failed: " + err, Toast.LENGTH_SHORT).show()));
                 }
                 return true;
             });

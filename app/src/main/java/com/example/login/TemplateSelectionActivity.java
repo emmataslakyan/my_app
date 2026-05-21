@@ -14,12 +14,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.concurrent.Executors;
 
 public class TemplateSelectionActivity extends BaseActivity {
 
-    private int currentResumeId = -1;
+    private String currentResumeId;
     private TemplateRepository repository;
+    private ResumeRepository resumeRepo;
     private TemplateAdapter adapter;
     private ProgressBar loading;
     private TextView empty;
@@ -29,7 +29,7 @@ public class TemplateSelectionActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_template_selection);
 
-        currentResumeId = getIntent().getIntExtra("RESUME_ID", -1);
+        currentResumeId = getIntent().getStringExtra("RESUME_ID");
 
         ImageButton backBtn = findViewById(R.id.backBtn);
         if (backBtn != null) backBtn.setOnClickListener(v -> finish());
@@ -42,6 +42,7 @@ public class TemplateSelectionActivity extends BaseActivity {
         recycler.setAdapter(adapter);
 
         repository = new TemplateRepository(this);
+        resumeRepo = new ResumeRepository();
         loadTemplates();
     }
 
@@ -56,29 +57,24 @@ public class TemplateSelectionActivity extends BaseActivity {
     }
 
     private void onTemplatePicked(ResumeTemplate template) {
+        if (currentResumeId == null || currentResumeId.isEmpty()) {
+            Toast.makeText(this, "Error: Resume id missing", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         String currentDate = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(new Date());
 
-        Executors.newSingleThreadExecutor().execute(() -> {
-            AppDatabase db = AppDatabase.getInstance(TemplateSelectionActivity.this);
-            Resume existingResume = db.resumeDao().getResumeById(currentResumeId);
-
-            if (existingResume == null) {
-                runOnUiThread(() -> Toast.makeText(this, "Error: Resume data lost", Toast.LENGTH_SHORT).show());
-                return;
-            }
-
-            existingResume.setTemplateId(template.getId());
-            existingResume.setDate(currentDate);
-            db.resumeDao().update(existingResume);
-
-            runOnUiThread(() -> {
+        resumeRepo.get(currentResumeId, existing -> {
+            existing.setTemplateId(template.getId());
+            existing.setDate(currentDate);
+            resumeRepo.update(existing, () -> {
                 Toast.makeText(this, "Template Selected!", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(TemplateSelectionActivity.this, ResumePreviewActivity.class);
                 intent.putExtra("RESUME_ID", currentResumeId);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 finish();
-            });
-        });
+            }, err -> Toast.makeText(this, "Save failed: " + err, Toast.LENGTH_SHORT).show());
+        }, err -> Toast.makeText(this, "Error: Resume data lost", Toast.LENGTH_SHORT).show());
     }
 }

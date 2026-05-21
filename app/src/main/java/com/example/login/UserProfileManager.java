@@ -24,13 +24,12 @@ public class UserProfileManager {
     public static final String KEY_DOB         = "dateOfBirth";
     public static final String KEY_PHOTO_URL   = "photoUrl";
 
-    public static final String EDU_DEGREE = "degree";
-    public static final String EDU_SCHOOL = "school";
-    public static final String EDU_FIELD  = "fieldOfStudy";
-    public static final String EDU_START  = "startYear";
-    public static final String EDU_END    = "endYear";
-    public static final String EDU_GPA    = "gpa";
-    public static final String EDU_ID     = "id";
+    public static final String EDU_SCHOOL      = "school";
+    public static final String EDU_LOCATION    = "location";
+    public static final String EDU_DATE        = "date";
+    public static final String EDU_DEGREE      = "degree";
+    public static final String EDU_DESCRIPTION = "description";
+    public static final String EDU_ID          = "id";
 
     public static final String DOC_NAME     = "name";
     public static final String DOC_URL      = "url";
@@ -126,17 +125,16 @@ public class UserProfileManager {
     // ── Education ─────────────────────────────────────────────────────────────
 
     public void saveEducationEntry(String entryId,
-                                   String degree, String school, String field,
-                                   String startYear, String endYear, String gpa,
+                                   String school, String location, String date,
+                                   String degree, String description,
                                    OnSuccessCallback onSuccess, OnFailureCallback onFailure) {
         if (uid == null) { onFailure.onFailure("User not signed in"); return; }
         Map<String, Object> entry = new HashMap<>();
-        entry.put(EDU_DEGREE, degree);
-        entry.put(EDU_SCHOOL, school);
-        entry.put(EDU_FIELD,  field);
-        entry.put(EDU_START,  startYear);
-        entry.put(EDU_END,    endYear);
-        entry.put(EDU_GPA,    gpa);
+        entry.put(EDU_SCHOOL,      school);
+        entry.put(EDU_LOCATION,    location);
+        entry.put(EDU_DATE,        date);
+        entry.put(EDU_DEGREE,      degree);
+        entry.put(EDU_DESCRIPTION, description);
         DocumentReference ref = (entryId == null || entryId.isEmpty())
                 ? educationRef().document()
                 : educationRef().document(entryId);
@@ -257,54 +255,6 @@ public class UserProfileManager {
 
     public void saveLanguages(String languages, OnSuccessCallback onSuccess, OnFailureCallback onFailure) {
         saveExtraField(KEY_LANGUAGES, languages, onSuccess, onFailure);
-    }
-
-    // ── Resume auto-population ────────────────────────────────────────────────
-
-    public void populateNewResume(int resumeId,
-                                  OnSuccessCallback onDone, OnFailureCallback onFailure) {
-        if (uid == null) { onFailure.onFailure("User not signed in"); return; }
-        loadProfile(profileData -> {
-            Map<String, Object> snapshot = new HashMap<>(profileData);
-            loadEducation(eduList -> {
-                snapshot.put("educationSnapshot", eduList);
-                snapshot.put("createdAt", com.google.firebase.Timestamp.now());
-                writeResumeSnapshot(resumeId, snapshot, onDone, onFailure);
-            }, err -> writeResumeSnapshot(resumeId, snapshot, onDone, onFailure));
-        }, err -> onFailure.onFailure(err));
-    }
-
-    private void writeResumeSnapshot(int resumeId, Map<String, Object> snapshot,
-                                     OnSuccessCallback onDone, OnFailureCallback onFailure) {
-        db.collection("resumes").document(String.valueOf(resumeId))
-                .set(snapshot, SetOptions.merge())
-                .addOnSuccessListener(v -> onDone.onSuccess())
-                .addOnFailureListener(e -> onFailure.onFailure(e.getMessage()));
-    }
-
-    public void applySnapshotToPrefs(android.content.Context ctx, int resumeId,
-                                     OnSuccessCallback onDone) {
-        db.collection("resumes").document(String.valueOf(resumeId)).get()
-                .addOnSuccessListener(doc -> {
-                    if (!doc.exists()) { onDone.onSuccess(); return; }
-                    android.content.SharedPreferences.Editor prefs =
-                            ctx.getSharedPreferences("PersonalDetails_" + resumeId,
-                                    android.content.Context.MODE_PRIVATE).edit();
-                    safeSet(prefs, "fullName", doc.getString(KEY_FULL_NAME));
-                    safeSet(prefs, "email",    doc.getString(KEY_EMAIL));
-                    safeSet(prefs, "phone",    doc.getString(KEY_PHONE));
-                    safeSet(prefs, "address",  doc.getString(KEY_ADDRESS));
-                    safeSet(prefs, "linkedin", doc.getString(KEY_LINKEDIN));
-                    safeSet(prefs, "summary",  doc.getString(KEY_SUMMARY));
-                    prefs.apply();
-                    onDone.onSuccess();
-                })
-                .addOnFailureListener(e -> onDone.onSuccess());
-    }
-
-    private void safeSet(android.content.SharedPreferences.Editor prefs,
-                         String key, String value) {
-        if (value != null && !value.isEmpty()) prefs.putString(key, value);
     }
 
     // ── Callbacks ─────────────────────────────────────────────────────────────

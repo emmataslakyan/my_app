@@ -15,23 +15,27 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class ResumePreviewActivity extends BaseActivity {
 
-    private int currentResumeId;
+    private String currentResumeId;
     private WebView webView;
     private ProgressBar loading;
     private boolean templateLoaded;
 
     private TemplateRepository repository;
+    private ResumeRepository resumeRepo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_resume_preview);
 
-        currentResumeId = getIntent().getIntExtra("RESUME_ID", -1);
+        currentResumeId = getIntent().getStringExtra("RESUME_ID");
         repository = new TemplateRepository(this);
+        resumeRepo = new ResumeRepository();
 
         webView = findViewById(R.id.resumeWebView);
         loading = findViewById(R.id.resumeLoading);
@@ -69,41 +73,68 @@ public class ResumePreviewActivity extends BaseActivity {
     private void loadResume() {
         loading.setVisibility(View.VISIBLE);
         templateLoaded = false;
-        new Thread(() -> {
-            AppDatabase db = AppDatabase.getInstance(this);
-            Resume resume = db.resumeDao().getResumeById(currentResumeId);
-            if (resume == null) {
+        if (currentResumeId == null || currentResumeId.isEmpty()) {
+            loading.setVisibility(View.GONE);
+            Toast.makeText(this, "Resume not found", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        resumeRepo.get(currentResumeId, resume -> {
+            // Fall back to the user's profile photo (Firestore) if this resume has none.
+            if (resume.getPhotoPath() == null || resume.getPhotoPath().isEmpty()) {
+                new Thread(() -> {
+                    String url = fetchProfilePhotoUrlBlocking();
+                    if (url != null && !url.isEmpty()) resume.setPhotoPath(url);
+                    runOnUiThread(() -> renderResume(resume));
+                }).start();
+            } else {
+                renderResume(resume);
+            }
+        }, err -> {
+            loading.setVisibility(View.GONE);
+            Toast.makeText(this, "Resume not found", Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    private void renderResume(Resume resume) {
+        ResumeTemplate tpl = resolveTemplate(resume.getTemplateId());
+        Map<String, Object> ctx = ResumeDataMapper.toContext(resume);
+        repository.loadTemplateHtml(tpl, new TemplateRepository.HtmlCallback() {
+            @Override public void onHtml(String html, String baseUrl) {
+                String rendered = MustacheRenderer.render(html, ctx);
+                runOnUiThread(() -> webView.loadDataWithBaseURL(
+                        baseUrl, rendered, "text/html", "UTF-8", null));
+            }
+            @Override public void onError(Exception e) {
                 runOnUiThread(() -> {
                     loading.setVisibility(View.GONE);
-                    Toast.makeText(this, "Resume not found", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ResumePreviewActivity.this,
+                            "Couldn't load template", Toast.LENGTH_SHORT).show();
                 });
-                return;
             }
-            // Fall back to global profile photo if this resume has none
-            if (resume.getPhotoPath() == null || resume.getPhotoPath().isEmpty()) {
-                String global = getSharedPreferences("ProfilePrefs", MODE_PRIVATE)
-                        .getString("profile_photo_path", null);
-                if (global != null && new java.io.File(global).exists()) {
-                    resume.setPhotoPath(global);
-                }
-            }
-            ResumeTemplate tpl = resolveTemplate(resume.getTemplateId());
-            Map<String, Object> ctx = ResumeDataMapper.toContext(resume);
-            repository.loadTemplateHtml(tpl, new TemplateRepository.HtmlCallback() {
-                @Override public void onHtml(String html, String baseUrl) {
-                    String rendered = MustacheRenderer.render(html, ctx);
-                    runOnUiThread(() -> webView.loadDataWithBaseURL(
-                            baseUrl, rendered, "text/html", "UTF-8", null));
-                }
-                @Override public void onError(Exception e) {
-                    runOnUiThread(() -> {
-                        loading.setVisibility(View.GONE);
-                        Toast.makeText(ResumePreviewActivity.this,
-                                "Couldn't load template", Toast.LENGTH_SHORT).show();
-                    });
-                }
-            });
-        }).start();
+        });
+    }
+
+    /**
+     * Blocking lookup of the user's profile photo URL from Firestore. Called from a
+     * worker thread during resume preview render so the resume's empty photoPath can
+     * be seeded with the latest cross-device value.
+     */
+    private String fetchProfilePhotoUrlBlocking() {
+        final String[] result = {null};
+        final CountDownLatch latch = new CountDownLatch(1);
+        new UserProfileManager().loadProfile(
+                data -> {
+                    Object v = data.get(UserProfileManager.KEY_PHOTO_URL);
+                    if (v != null) result[0] = v.toString();
+                    latch.countDown();
+                },
+                err -> latch.countDown());
+        try {
+            latch.await(3, TimeUnit.SECONDS);
+        } catch (InterruptedException ignored) {
+            Thread.currentThread().interrupt();
+        }
+        return result[0];
     }
 
     private ResumeTemplate resolveTemplate(String id) {

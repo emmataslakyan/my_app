@@ -2,8 +2,6 @@ package com.example.login;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
@@ -21,6 +19,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.os.LocaleListCompat;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -28,16 +27,15 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Map;
 
 public class ProfileActivity extends BaseActivity {
 
     private static final String TAG = "ProfileActivity";
-    public static final int PROFILE_RESUME_ID = -1;
+    /** Sentinel resume id used by section editors to switch into "profile mode" (writes to UserProfileManager instead of a resume). */
+    public static final String PROFILE_RESUME_ID = "__profile__";
 
     private FirebaseAuth mAuth;
     private UserProfileManager profileManager;
@@ -123,7 +121,7 @@ public class ProfileActivity extends BaseActivity {
         ImageButton btnEditEdu = findViewById(R.id.btn_edit_education);
         if (btnEditEdu != null)
             btnEditEdu.setOnClickListener(v -> {
-                Intent i = new Intent(this, EducationActivity.class);
+                Intent i = new Intent(this, EducationListActivity.class);
                 i.putExtra("RESUME_ID", PROFILE_RESUME_ID);
                 startActivity(i);
             });
@@ -260,22 +258,30 @@ public class ProfileActivity extends BaseActivity {
     }
 
     // ── Profile Photo Logic ──────────────────────────────────────────────────
+    //
+    // Source of truth: Firebase Storage (bytes) + Firestore "photoUrl" (download URL).
+    // We do NOT persist a local cache — Glide's URL cache handles fast subsequent loads.
 
     private void handleProfilePhotoSelected(Uri uri) {
-        String path = copyImageToStorage(uri, "profile_photo_global.jpg");
-        if (path != null) {
-            getSharedPreferences("ProfilePrefs", MODE_PRIVATE)
-                    .edit().putString("profile_photo_path", path).apply();
-            loadBitmapIntoAvatar(path);
+        // Show the picked image immediately as a preview while the upload runs.
+        if (profileAvatar != null) {
+            profileAvatar.setImageTintList(null);
+            Glide.with(this).load(uri).circleCrop().into(profileAvatar);
         }
 
         FirebaseUser user = mAuth.getCurrentUser();
-        if (user == null || path == null) return;
+        if (user == null) return;
+
+        byte[] photoBytes = readBytesFromUri(uri);
+        if (photoBytes == null) {
+            toast("Couldn't read the selected image.");
+            return;
+        }
 
         StorageReference ref = FirebaseStorage.getInstance()
                 .getReference("users/" + user.getUid() + "/profile_photo.jpg");
 
-        ref.putFile(Uri.fromFile(new File(path)))
+        ref.putBytes(photoBytes)
                 .addOnSuccessListener(snap ->
                         ref.getDownloadUrl().addOnSuccessListener(downloadUri ->
                                 profileManager.savePhotoUrl(
@@ -285,38 +291,27 @@ public class ProfileActivity extends BaseActivity {
                         Log.e(TAG, "Profile photo upload failed: " + e.getMessage()));
     }
 
-    private String copyImageToStorage(Uri sourceUri, String fileName) {
-        try {
-            File destFile = new File(getFilesDir(), fileName);
-            try (InputStream in  = getContentResolver().openInputStream(sourceUri);
-                 OutputStream out = new FileOutputStream(destFile)) {
-                if (in == null) return null;
-                Bitmap bmp = BitmapFactory.decodeStream(in);
-                if (bmp == null) return null;
-                bmp.compress(Bitmap.CompressFormat.JPEG, 90, out);
-            }
-            return destFile.getAbsolutePath();
+    private byte[] readBytesFromUri(Uri uri) {
+        try (InputStream in = getContentResolver().openInputStream(uri)) {
+            if (in == null) return null;
+            ByteArrayOutputStream buf = new ByteArrayOutputStream();
+            byte[] tmp = new byte[4096];
+            int n;
+            while ((n = in.read(tmp)) != -1) buf.write(tmp, 0, n);
+            return buf.toByteArray();
         } catch (Exception e) {
-            Log.e(TAG, "Failed to copy image", e);
+            Log.e(TAG, "readBytesFromUri failed", e);
             return null;
         }
     }
 
     private void loadProfilePhoto() {
-        String localPath = getSharedPreferences("ProfilePrefs", MODE_PRIVATE)
-                .getString("profile_photo_path", null);
-        if (localPath != null && new File(localPath).exists()) {
-            loadBitmapIntoAvatar(localPath);
-        }
-    }
-
-    private void loadBitmapIntoAvatar(String path) {
-        if (path == null || profileAvatar == null) return;
-        Bitmap bmp = BitmapFactory.decodeFile(path);
-        if (bmp != null) {
+        profileManager.loadProfile(data -> runOnUiThread(() -> {
+            String url = getStr(data, UserProfileManager.KEY_PHOTO_URL);
+            if (url.isEmpty() || profileAvatar == null) return;
             profileAvatar.setImageTintList(null);
-            profileAvatar.setImageBitmap(bmp);
-        }
+            Glide.with(this).load(url).circleCrop().into(profileAvatar);
+        }), err -> Log.e(TAG, "Photo load failed: " + err));
     }
 
     // ── Data Loading & UI ─────────────────────────────────────────────────────

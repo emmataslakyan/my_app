@@ -16,7 +16,7 @@ public class MyResumesActivity extends BaseActivity {
 
     private RecyclerView resumeRecyclerView;
     private ResumeAdapter adapter;
-    private AppDatabase db;
+    private ResumeRepository repo;
     private final List<Resume> resumeList = new ArrayList<>();
 
     @Override
@@ -24,7 +24,7 @@ public class MyResumesActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_resumes);
 
-        db = AppDatabase.getInstance(this);
+        repo = new ResumeRepository();
 
         ImageButton backBtn = findViewById(R.id.backBtn);
         if (backBtn != null) backBtn.setOnClickListener(v -> finish());
@@ -32,7 +32,7 @@ public class MyResumesActivity extends BaseActivity {
         resumeRecyclerView = findViewById(R.id.profileRecyclerView);
         resumeRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        adapter = new ResumeAdapter(resumeList, db);
+        adapter = new ResumeAdapter(resumeList, repo, this::loadResumes);
         resumeRecyclerView.setAdapter(adapter);
 
         findViewById(R.id.createProfileBtn).setOnClickListener(v -> createNewResume());
@@ -47,51 +47,26 @@ public class MyResumesActivity extends BaseActivity {
     // ── Create resume with auto-populated profile data ────────────────────────
 
     private void createNewResume() {
-        new Thread(() -> {
-            try {
-                // 1. Insert blank resume into Room DB
-                Resume newResume = new Resume();
-                newResume.setTitle("New Resume");
-                newResume.setDate("Created: " +
-                        java.text.DateFormat.getDateInstance().format(new java.util.Date()));
-                long newId = db.resumeDao().insert(newResume);
+        Resume newResume = new Resume();
+        newResume.setTitle("New Resume");
+        newResume.setDate("Created: " +
+                java.text.DateFormat.getDateInstance().format(new java.util.Date()));
 
-                // 2. Load the user's global profile from Firestore and pre-fill Room DB.
-                //    This is what makes PersonalDetailsActivity open with data already there.
-                UserProfileManager mgr = new UserProfileManager();
-                mgr.loadProfile(
-                        profileData -> prefillResumeInDb((int) newId, profileData, mgr),
-                        err -> {
-                            // No profile yet — open editor anyway
-                            runOnUiThread(() -> openEditor((int) newId));
-                        });
-
-            } catch (Exception e) {
-                android.util.Log.e("MyResumesActivity", "Insert failed: " + e.getMessage());
-            }
-        }).start();
+        repo.create(newResume,
+                newId -> {
+                    UserProfileManager mgr = new UserProfileManager();
+                    mgr.loadProfile(
+                            profileData -> applyProfileToResume(newId, profileData, mgr),
+                            err -> openEditor(newId));
+                },
+                err -> Toast.makeText(this, "Create failed: " + err, Toast.LENGTH_SHORT).show());
     }
 
-    /**
-     * Writes the global profile data into the Room DB Resume row AND into the
-     * Firestore resume snapshot. Both are needed:
-     *   - Room DB  → all section activities read their data from here
-     *   - Firestore → ResumeEditorActivity's applySnapshotToPrefs fills SharedPreferences
-     */
-    private void prefillResumeInDb(int resumeId,
-                                   Map<String, Object> profileData,
-                                   UserProfileManager mgr) {
-        // Step 1: apply profile fields to Room DB row, then chain experience and education loads
-        applyProfileToResume(resumeId, profileData, mgr);
-    }
-
-    private void applyProfileToResume(int resumeId,
+    /** Populates a newly-created resume from the user's global profile, then opens the editor. */
+    private void applyProfileToResume(String resumeId,
                                       Map<String, Object> profileData,
                                       UserProfileManager mgr) {
-        new Thread(() -> {
-            Resume r = db.resumeDao().getResumeById(resumeId);
-            if (r == null) { runOnUiThread(() -> openEditor(resumeId)); return; }
-
+        repo.get(resumeId, r -> {
             String name      = getStr(profileData, UserProfileManager.KEY_FULL_NAME);
             String email     = getStr(profileData, UserProfileManager.KEY_EMAIL);
             String phone     = getStr(profileData, UserProfileManager.KEY_PHONE);
@@ -107,71 +82,53 @@ public class MyResumesActivity extends BaseActivity {
             if (!languages.isEmpty()) r.setLanguages(languages);
 
             if (r.getPhotoPath() == null || r.getPhotoPath().isEmpty()) {
-                String globalPhoto = getSharedPreferences("ProfilePrefs", MODE_PRIVATE)
-                        .getString("profile_photo_path", null);
-                if (globalPhoto != null && new java.io.File(globalPhoto).exists()) {
-                    r.setPhotoPath(globalPhoto);
-                }
+                String photoUrl = getStr(profileData, UserProfileManager.KEY_PHOTO_URL);
+                if (!photoUrl.isEmpty()) r.setPhotoPath(photoUrl);
             }
 
-            db.resumeDao().update(r);
-        }).start();
-
-        // Step 2: load experience from Firestore and write to Room DB
-        mgr.loadExperience(expList -> {
-            if (!expList.isEmpty()) {
-                List<ExperienceEntry> entries = new ArrayList<>();
-                for (Map<String, Object> e : expList) {
-                    ExperienceEntry entry = new ExperienceEntry();
-                    entry.expOrgName  = getStr(e, UserProfileManager.EXP_ORG);
-                    entry.expPosition = getStr(e, UserProfileManager.EXP_POS);
-                    entry.expLocation = getStr(e, UserProfileManager.EXP_LOC);
-                    entry.expDate     = getStr(e, UserProfileManager.EXP_DATE);
-                    entry.expBullets  = getStr(e, UserProfileManager.EXP_BULLETS);
-                    entries.add(entry);
+            mgr.loadExperience(expList -> {
+                if (!expList.isEmpty()) {
+                    List<ExperienceEntry> entries = new ArrayList<>();
+                    for (Map<String, Object> e : expList) {
+                        ExperienceEntry entry = new ExperienceEntry();
+                        entry.expOrgName  = getStr(e, UserProfileManager.EXP_ORG);
+                        entry.expPosition = getStr(e, UserProfileManager.EXP_POS);
+                        entry.expLocation = getStr(e, UserProfileManager.EXP_LOC);
+                        entry.expDate     = getStr(e, UserProfileManager.EXP_DATE);
+                        entry.expBullets  = getStr(e, UserProfileManager.EXP_BULLETS);
+                        entries.add(entry);
+                    }
+                    r.setExperienceJson(ResumeEntries.serializeExperience(entries));
                 }
-                String expJson = ResumeEntries.serializeExperience(entries);
-                new Thread(() -> {
-                    Resume r = db.resumeDao().getResumeById(resumeId);
-                    if (r != null) { r.setExperienceJson(expJson); db.resumeDao().update(r); }
-                }).start();
-            }
-        }, err -> {});
 
-        // Step 3: load education from Firestore and write to Room DB
-        mgr.loadEducation(eduList -> {
-            if (!eduList.isEmpty()) {
-                List<EducationEntry> entries = new ArrayList<>();
-                for (Map<String, Object> e : eduList) {
-                    EducationEntry entry = new EducationEntry();
-                    entry.schoolName        = getStr(e, UserProfileManager.EDU_SCHOOL);
-                    entry.degree            = getStr(e, UserProfileManager.EDU_DEGREE);
-                    entry.schoolLocation    = getStr(e, "location");
-                    entry.schoolDate        = getStr(e, UserProfileManager.EDU_START);
-                    entry.schoolDescription = getStr(e, "activities");
-                    entries.add(entry);
-                }
-                String eduJson = ResumeEntries.serializeEducation(entries);
-                new Thread(() -> {
-                    Resume r = db.resumeDao().getResumeById(resumeId);
-                    if (r != null) { r.setEducationJson(eduJson); db.resumeDao().update(r); }
-                }).start();
-            }
-        }, err -> {});
+                mgr.loadEducation(eduList -> {
+                    if (!eduList.isEmpty()) {
+                        List<EducationEntry> entries = new ArrayList<>();
+                        for (Map<String, Object> e : eduList) {
+                            EducationEntry entry = new EducationEntry();
+                            entry.schoolName        = getStr(e, UserProfileManager.EDU_SCHOOL);
+                            entry.schoolLocation    = getStr(e, UserProfileManager.EDU_LOCATION);
+                            entry.schoolDate        = getStr(e, UserProfileManager.EDU_DATE);
+                            entry.degree            = getStr(e, UserProfileManager.EDU_DEGREE);
+                            entry.schoolDescription = getStr(e, UserProfileManager.EDU_DESCRIPTION);
+                            entries.add(entry);
+                        }
+                        r.setEducationJson(ResumeEntries.serializeEducation(entries));
+                    }
+                    repo.update(r,
+                            () -> openEditor(resumeId),
+                            err -> openEditor(resumeId));
+                }, err -> repo.update(r,
+                        () -> openEditor(resumeId),
+                        e2 -> openEditor(resumeId)));
+            }, err -> repo.update(r,
+                    () -> openEditor(resumeId),
+                    e2 -> openEditor(resumeId)));
 
-        // Step 4: write the Firestore snapshot (for SharedPreferences pre-fill) and open editor
-        mgr.populateNewResume(
-                resumeId,
-                () -> runOnUiThread(() -> openEditor(resumeId)),
-                err -> runOnUiThread(() -> {
-                    Toast.makeText(this,
-                            "Profile could not be fully pre-filled.",
-                            Toast.LENGTH_SHORT).show();
-                    openEditor(resumeId);
-                }));
+        }, err -> openEditor(resumeId));
     }
 
-    private void openEditor(int resumeId) {
+    private void openEditor(String resumeId) {
         Intent intent = new Intent(MyResumesActivity.this, ResumeEditorActivity.class);
         intent.putExtra("RESUME_ID", resumeId);
         startActivity(intent);
@@ -180,17 +137,12 @@ public class MyResumesActivity extends BaseActivity {
     // ── Load resume list ──────────────────────────────────────────────────────
 
     public void loadResumes() {
-        new Thread(() -> {
-            List<Resume> latestList = db.resumeDao().getAllResumes();
-            runOnUiThread(() -> {
-                resumeList.clear();
-                resumeList.addAll(latestList);
-                adapter.notifyDataSetChanged();
-            });
-        }).start();
+        repo.getAll(latestList -> {
+            resumeList.clear();
+            resumeList.addAll(latestList);
+            adapter.notifyDataSetChanged();
+        }, err -> android.util.Log.e("MyResumesActivity", "Load failed: " + err));
     }
-
-    // ── Utility ───────────────────────────────────────────────────────────────
 
     private String getStr(Map<String, Object> map, String key) {
         Object v = map.get(key);

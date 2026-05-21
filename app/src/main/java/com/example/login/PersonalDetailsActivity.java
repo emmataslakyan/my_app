@@ -1,7 +1,6 @@
 package com.example.login;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -14,6 +13,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
@@ -32,15 +32,12 @@ public class PersonalDetailsActivity extends BaseActivity {
 
     private static final String TAG = "PersonalDetailsActivity";
 
-    // RESUME_ID == -1 means "profile mode" — saves to Firestore, not Room DB
-    private static final int PROFILE_RESUME_ID = ProfileActivity.PROFILE_RESUME_ID;
-
     private TextInputEditText editName, editEmail, editPhone, editAddress,
             editLinkedin, editSummary;
     private ShapeableImageView imgProfilePhoto;
 
-    private AppDatabase db;
-    private int currentResumeId;
+    private ResumeRepository repo;
+    private String currentResumeId;
     private Resume currentResume;
     private String pendingPhotoPath = null;
 
@@ -63,9 +60,9 @@ public class PersonalDetailsActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_personal_details);
 
-        currentResumeId = getIntent().getIntExtra("RESUME_ID", -1);
-        isProfileMode   = (currentResumeId == PROFILE_RESUME_ID);
-        db              = AppDatabase.getInstance(this);
+        currentResumeId = getIntent().getStringExtra("RESUME_ID");
+        isProfileMode   = ProfileActivity.PROFILE_RESUME_ID.equals(currentResumeId);
+        repo            = new ResumeRepository();
         profileManager  = new UserProfileManager();
 
         bindViews();
@@ -102,28 +99,27 @@ public class PersonalDetailsActivity extends BaseActivity {
     }
 
     private void handlePhotoSelected(Uri sourceUri) {
-        String fileName = isProfileMode
-                ? "profile_photo_global.jpg"
-                : "profile_photo_" + currentResumeId + ".jpg";
+        if (isProfileMode) {
+            // Profile photo: Firebase is the source of truth. Preview from the picker
+            // Uri while the upload runs in the background.
+            if (imgProfilePhoto != null) {
+                imgProfilePhoto.setImageTintList(null);
+                Glide.with(this).load(sourceUri).into(imgProfilePhoto);
+            }
+            uploadPhotoToFirebase(sourceUri);
+            return;
+        }
 
-        // Copy to internal storage so we always have a local path
-        String savedPath = copyImageToInternalStorage(sourceUri, fileName);
+        // Per-resume photo override: keep a local file path so the Mustache renderer can
+        // embed it as base64 even when the device is offline.
+        String savedPath = copyImageToInternalStorage(
+                sourceUri, "profile_photo_" + currentResumeId + ".jpg");
         if (savedPath == null) {
             Toast.makeText(this, "Failed to load image. Try again.", Toast.LENGTH_SHORT).show();
             return;
         }
-
         pendingPhotoPath = savedPath;
-        loadBitmapIntoView(savedPath);   // shows the photo immediately
-
-        if (isProfileMode) {
-            // Cache path for ProfileActivity to find it quickly
-            getSharedPreferences("ProfilePrefs", MODE_PRIVATE)
-                    .edit().putString("profile_photo_path", savedPath).apply();
-
-            // Upload to Firebase Storage for cross-device sync
-            uploadPhotoToFirebase(sourceUri);
-        }
+        loadBitmapIntoView(savedPath);
     }
 
     // ── Firebase Storage photo upload ─────────────────────────────────────────
@@ -205,7 +201,6 @@ public class PersonalDetailsActivity extends BaseActivity {
 
     private void loadExistingData() {
         if (isProfileMode) {
-            // Read from Firestore
             profileManager.loadProfile(data -> runOnUiThread(() -> {
                 setField(editName,     getStr(data, UserProfileManager.KEY_FULL_NAME));
                 setField(editEmail,    getStr(data, UserProfileManager.KEY_EMAIL));
@@ -214,52 +209,59 @@ public class PersonalDetailsActivity extends BaseActivity {
                 setField(editLinkedin, getStr(data, UserProfileManager.KEY_LINKEDIN));
                 setField(editSummary,  getStr(data, UserProfileManager.KEY_SUMMARY));
 
-                // Load photo from local cache
-                String localPath = getSharedPreferences("ProfilePrefs", MODE_PRIVATE)
-                        .getString("profile_photo_path", null);
-                if (localPath != null) {
-                    pendingPhotoPath = localPath;
-                    loadBitmapIntoView(localPath);
+                String photoUrl = getStr(data, UserProfileManager.KEY_PHOTO_URL);
+                if (!photoUrl.isEmpty() && imgProfilePhoto != null) {
+                    imgProfilePhoto.setImageTintList(null);
+                    Glide.with(this).load(photoUrl).into(imgProfilePhoto);
                 }
             }), err -> Log.e(TAG, "Firestore load failed: " + err));
 
         } else {
-            // Per-resume mode — read from Room DB
-            if (currentResumeId < 0) return;
-            new Thread(() -> {
-                currentResume = db.resumeDao().getResumeById(currentResumeId);
-                if (currentResume == null) return;
-                runOnUiThread(() -> {
-                    setField(editName,    currentResume.getName());
-                    setField(editEmail,   currentResume.getEmail());
-                    setField(editPhone,   currentResume.getPhone());
-                    setField(editAddress, currentResume.getAddress());
-                    // LinkedIn / summary are in the resume if you add those columns;
-                    // pre-filled values come from the Firestore snapshot via applySnapshotToPrefs
+            // Per-resume mode — read from Firestore
+            if (currentResumeId == null || currentResumeId.isEmpty()) return;
+            repo.get(currentResumeId, r -> {
+                currentResume = r;
+                setField(editName,    r.getName());
+                setField(editEmail,   r.getEmail());
+                setField(editPhone,   r.getPhone());
+                setField(editAddress, r.getAddress());
 
-                    String savedPath = currentResume.getPhotoPath();
-                    if (savedPath != null && new java.io.File(savedPath).exists()) {
-                        pendingPhotoPath = savedPath;
-                        loadBitmapIntoView(savedPath);
-                    } else {
-                        // No per-resume photo yet — pre-fill with the global profile photo
-                        String profilePath = getSharedPreferences("ProfilePrefs", MODE_PRIVATE)
-                                .getString("profile_photo_path", null);
-                        if (profilePath != null && new java.io.File(profilePath).exists()) {
-                            pendingPhotoPath = profilePath;
-                            loadBitmapIntoView(profilePath);
-                        }
-                    }
-                });
-            }).start();
+                String savedPath = r.getPhotoPath();
+                if (savedPath != null && !savedPath.isEmpty()) {
+                    displayPhotoFromPathOrUrl(savedPath);
+                } else {
+                    loadProfilePhotoIntoView();
+                }
+            }, err -> Log.e(TAG, "Resume load failed: " + err));
         }
+    }
+
+    /** Displays a stored photoPath value which may be either a local file path or an http(s) URL. */
+    private void displayPhotoFromPathOrUrl(String pathOrUrl) {
+        if (imgProfilePhoto == null) return;
+        if (pathOrUrl.startsWith("http://") || pathOrUrl.startsWith("https://")) {
+            imgProfilePhoto.setImageTintList(null);
+            Glide.with(this).load(pathOrUrl).into(imgProfilePhoto);
+        } else if (new File(pathOrUrl).exists()) {
+            loadBitmapIntoView(pathOrUrl);
+        }
+    }
+
+    private void loadProfilePhotoIntoView() {
+        profileManager.loadProfile(data -> runOnUiThread(() -> {
+            String url = getStr(data, UserProfileManager.KEY_PHOTO_URL);
+            if (!url.isEmpty() && imgProfilePhoto != null) {
+                imgProfilePhoto.setImageTintList(null);
+                Glide.with(this).load(url).into(imgProfilePhoto);
+            }
+        }), err -> Log.e(TAG, "Profile photo load failed: " + err));
     }
 
     // ── Save ──────────────────────────────────────────────────────────────────
 
     private void saveDetails() {
         if (isProfileMode) saveToFirestore();
-        else               saveToRoomDb();
+        else               saveToResume();
     }
 
     private void saveToFirestore() {
@@ -288,7 +290,7 @@ public class PersonalDetailsActivity extends BaseActivity {
                         Toast.makeText(this, "Save failed: " + err, Toast.LENGTH_LONG).show()));
     }
 
-    private void saveToRoomDb() {
+    private void saveToResume() {
         if (currentResume == null) return;
         currentResume.setName(trimField(editName));
         currentResume.setEmail(trimField(editEmail));
@@ -296,13 +298,12 @@ public class PersonalDetailsActivity extends BaseActivity {
         currentResume.setAddress(trimField(editAddress));
         if (pendingPhotoPath != null) currentResume.setPhotoPath(pendingPhotoPath);
 
-        new Thread(() -> {
-            db.resumeDao().update(currentResume);
-            runOnUiThread(() -> {
-                Toast.makeText(this, "Profile Updated!", Toast.LENGTH_SHORT).show();
-                finish();
-            });
-        }).start();
+        repo.update(currentResume,
+                () -> {
+                    Toast.makeText(this, "Profile Updated!", Toast.LENGTH_SHORT).show();
+                    finish();
+                },
+                err -> Toast.makeText(this, "Save failed: " + err, Toast.LENGTH_SHORT).show());
     }
 
     // ── Instructions ──────────────────────────────────────────────────────────

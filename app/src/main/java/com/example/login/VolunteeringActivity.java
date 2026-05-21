@@ -16,8 +16,8 @@ public class VolunteeringActivity extends BaseActivity {
     private RecyclerView rvBullets;
     private BulletAdapter adapter;
     private final List<String> bulletList = new ArrayList<>();
-    private AppDatabase db;
-    private int resumeId;
+    private ResumeRepository repo;
+    private String resumeId;
     private Resume resume;
 
     @Override
@@ -25,10 +25,9 @@ public class VolunteeringActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_volunteering);
 
-        db = AppDatabase.getInstance(this);
-        resumeId = getIntent().getIntExtra("RESUME_ID", -1);
+        repo = new ResumeRepository();
+        resumeId = getIntent().getStringExtra("RESUME_ID");
 
-        // Bind all 4 main inputs
         editOrg = findViewById(R.id.editVolOrg);
         editPos = findViewById(R.id.editVolPos);
         editLoc = findViewById(R.id.editVolLocation);
@@ -48,26 +47,22 @@ public class VolunteeringActivity extends BaseActivity {
     }
 
     private void loadData() {
-        new Thread(() -> {
-            resume = db.resumeDao().getResumeById(resumeId);
-            if (resume != null) {
-                String saved = resume.getVolBullets();
-                if (saved != null && !saved.isEmpty()) {
-                    bulletList.addAll(Arrays.asList(saved.split("\\|")));
-                } else {
-                    bulletList.add("");
-                }
-                runOnUiThread(() -> {
-                    editOrg.setText(resume.getVolOrgName());
-                    editPos.setText(resume.getVolPosition());
-                    editLoc.setText(resume.getVolLocation());
-                    editDate.setText(resume.getVolDate());
-
-                    adapter = new BulletAdapter(bulletList);
-                    rvBullets.setAdapter(adapter);
-                });
+        if (resumeId == null || resumeId.isEmpty()) return;
+        repo.get(resumeId, r -> {
+            resume = r;
+            String saved = r.getVolBullets();
+            if (saved != null && !saved.isEmpty()) {
+                bulletList.addAll(Arrays.asList(saved.split("\\|")));
+            } else {
+                bulletList.add("");
             }
-        }).start();
+            editOrg.setText(r.getVolOrgName());
+            editPos.setText(r.getVolPosition());
+            editLoc.setText(r.getVolLocation());
+            editDate.setText(r.getVolDate());
+            adapter = new BulletAdapter(bulletList);
+            rvBullets.setAdapter(adapter);
+        }, err -> Toast.makeText(this, "Couldn't load resume: " + err, Toast.LENGTH_SHORT).show());
     }
 
     private void saveVol() {
@@ -86,13 +81,12 @@ public class VolunteeringActivity extends BaseActivity {
         }
         resume.setVolBullets(sb.toString());
 
-        new Thread(() -> {
-            db.resumeDao().update(resume);
-            runOnUiThread(() -> {
-                Toast.makeText(this, "Volunteering Saved!", Toast.LENGTH_SHORT).show();
-                finish();
-            });
-        }).start();
+        repo.update(resume,
+                () -> {
+                    Toast.makeText(this, "Volunteering Saved!", Toast.LENGTH_SHORT).show();
+                    finish();
+                },
+                err -> Toast.makeText(this, "Save failed: " + err, Toast.LENGTH_SHORT).show());
     }
 
     private void showVolGuide() {

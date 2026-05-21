@@ -9,44 +9,43 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class EducationActivity extends BaseActivity {
 
-    public static final String EXTRA_ENTRY_INDEX = "ENTRY_INDEX";
+    public static final String EXTRA_ENTRY_INDEX   = "ENTRY_INDEX";
+    public static final String EXTRA_FIRESTORE_ID  = "ENTRY_FIRESTORE_ID";
 
     private TextInputEditText editSchool, editLocation, editDate, editDegree;
     private RecyclerView rvBullets;
     private BulletAdapter adapter;
     private final List<String> bulletList = new ArrayList<>();
 
-    private AppDatabase db;
-    private int currentResumeId;
+    private ResumeRepository repo;
+    private String currentResumeId;
     private int entryIndex = -1;
     private Resume currentResume;
     private List<EducationEntry> entries = new ArrayList<>();
 
     private UserProfileManager profileManager;
     private boolean isProfileMode;
+    private String firestoreEntryId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_education);
 
-        db              = AppDatabase.getInstance(this);
+        repo            = new ResumeRepository();
         profileManager  = new UserProfileManager();
-        currentResumeId = getIntent().getIntExtra("RESUME_ID", -1);
-        entryIndex      = getIntent().getIntExtra(EXTRA_ENTRY_INDEX, -1);
-        isProfileMode   = (currentResumeId == ProfileActivity.PROFILE_RESUME_ID);
+        currentResumeId  = getIntent().getStringExtra("RESUME_ID");
+        entryIndex       = getIntent().getIntExtra(EXTRA_ENTRY_INDEX, -1);
+        firestoreEntryId = getIntent().getStringExtra(EXTRA_FIRESTORE_ID);
+        isProfileMode    = ProfileActivity.PROFILE_RESUME_ID.equals(currentResumeId);
 
         editSchool   = findViewById(R.id.editSchool);
         editLocation = findViewById(R.id.editSchoolLocation);
@@ -76,37 +75,41 @@ public class EducationActivity extends BaseActivity {
     }
 
     private void loadProfileEducation() {
-        profileManager.loadEducation(
-                list -> runOnUiThread(() -> {
-                    if (!list.isEmpty()) {
-                        Map<String, Object> e = list.get(0);
-                        editSchool.setText(getStr(e, UserProfileManager.EDU_SCHOOL));
-                        editDegree.setText(getStr(e, UserProfileManager.EDU_DEGREE));
-                        editLocation.setText(getStr(e, "location"));
-                        editDate.setText(getStr(e, UserProfileManager.EDU_START));
-                        String acts = getStr(e, "activities");
-                        if (!acts.isEmpty()) {
-                            bulletList.addAll(Arrays.asList(acts.split("\\|")));
-                        }
+        if (firestoreEntryId == null || firestoreEntryId.isEmpty()) {
+            if (bulletList.isEmpty()) bulletList.add("");
+            adapter = new BulletAdapter(bulletList);
+            rvBullets.setAdapter(adapter);
+            return;
+        }
+        profileManager.loadEducation(list -> runOnUiThread(() -> {
+            for (Map<String, Object> e : list) {
+                if (firestoreEntryId.equals(e.get(UserProfileManager.EDU_ID))) {
+                    editSchool.setText(getStr(e, UserProfileManager.EDU_SCHOOL));
+                    editLocation.setText(getStr(e, UserProfileManager.EDU_LOCATION));
+                    editDate.setText(getStr(e, UserProfileManager.EDU_DATE));
+                    editDegree.setText(getStr(e, UserProfileManager.EDU_DEGREE));
+                    String desc = getStr(e, UserProfileManager.EDU_DESCRIPTION);
+                    if (!desc.isEmpty()) {
+                        bulletList.addAll(Arrays.asList(desc.split("\\|")));
                     }
-                    if (bulletList.isEmpty()) bulletList.add("");
-                    adapter = new BulletAdapter(bulletList);
-                    rvBullets.setAdapter(adapter);
-                }),
-                err -> runOnUiThread(() -> {
-                    if (bulletList.isEmpty()) bulletList.add("");
-                    adapter = new BulletAdapter(bulletList);
-                    rvBullets.setAdapter(adapter);
-                })
-        );
+                    break;
+                }
+            }
+            if (bulletList.isEmpty()) bulletList.add("");
+            adapter = new BulletAdapter(bulletList);
+            rvBullets.setAdapter(adapter);
+        }), err -> runOnUiThread(() -> {
+            if (bulletList.isEmpty()) bulletList.add("");
+            adapter = new BulletAdapter(bulletList);
+            rvBullets.setAdapter(adapter);
+        }));
     }
 
     private void loadResumeEducation() {
-        if (currentResumeId == -1) return;
-        new Thread(() -> {
-            currentResume = db.resumeDao().getResumeById(currentResumeId);
-            if (currentResume == null) return;
-            entries = ResumeEntries.parseEducation(currentResume.getEducationJson());
+        if (currentResumeId == null || currentResumeId.isEmpty()) return;
+        repo.get(currentResumeId, r -> {
+            currentResume = r;
+            entries = ResumeEntries.parseEducation(r.getEducationJson());
 
             EducationEntry entry = (entryIndex >= 0 && entryIndex < entries.size())
                     ? entries.get(entryIndex) : new EducationEntry();
@@ -117,15 +120,13 @@ public class EducationActivity extends BaseActivity {
                 bulletList.add("");
             }
 
-            runOnUiThread(() -> {
-                editSchool.setText(entry.schoolName);
-                editLocation.setText(entry.schoolLocation);
-                editDate.setText(entry.schoolDate);
-                editDegree.setText(entry.degree);
-                adapter = new BulletAdapter(bulletList);
-                rvBullets.setAdapter(adapter);
-            });
-        }).start();
+            editSchool.setText(entry.schoolName);
+            editLocation.setText(entry.schoolLocation);
+            editDate.setText(entry.schoolDate);
+            editDegree.setText(entry.degree);
+            adapter = new BulletAdapter(bulletList);
+            rvBullets.setAdapter(adapter);
+        }, err -> Toast.makeText(this, "Couldn't load resume: " + err, Toast.LENGTH_SHORT).show());
     }
 
     private void saveEducation() {
@@ -137,33 +138,19 @@ public class EducationActivity extends BaseActivity {
     }
 
     private void saveProfileEducation() {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null) {
-            Toast.makeText(this, getString(R.string.error_not_signed_in), Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        Map<String, Object> entry = new HashMap<>();
-        entry.put(UserProfileManager.EDU_SCHOOL,  str(editSchool));
-        entry.put(UserProfileManager.EDU_DEGREE,  str(editDegree));
-        entry.put("location",                     str(editLocation));
-        entry.put(UserProfileManager.EDU_START,   str(editDate));
-        entry.put(UserProfileManager.EDU_END,     "");
-        entry.put("activities",                   buildActivitiesString());
-
-        FirebaseFirestore.getInstance()
-                .collection("users")
-                .document(user.getUid())
-                .collection("education")
-                .document("entry_0")
-                .set(entry)
-                .addOnSuccessListener(unused -> {
+        profileManager.saveEducationEntry(
+                firestoreEntryId,
+                str(editSchool),
+                str(editLocation),
+                str(editDate),
+                str(editDegree),
+                buildActivitiesString(),
+                () -> runOnUiThread(() -> {
                     Toast.makeText(this, getString(R.string.education_saved), Toast.LENGTH_SHORT).show();
                     finish();
-                })
-                .addOnFailureListener(e ->
-                        Toast.makeText(this, getString(R.string.error_save_failed, e.getMessage()), Toast.LENGTH_SHORT).show()
-                );
+                }),
+                err -> runOnUiThread(() ->
+                        Toast.makeText(this, getString(R.string.error_save_failed, err), Toast.LENGTH_SHORT).show()));
     }
 
     private void saveResumeEducation() {
@@ -184,13 +171,14 @@ public class EducationActivity extends BaseActivity {
         }
         currentResume.setEducationJson(ResumeEntries.serializeEducation(entries));
 
-        new Thread(() -> {
-            db.resumeDao().update(currentResume);
-            runOnUiThread(() -> {
-                Toast.makeText(this, getString(R.string.education_saved), Toast.LENGTH_SHORT).show();
-                finish();
-            });
-        }).start();
+        repo.update(currentResume,
+                () -> {
+                    Toast.makeText(this, getString(R.string.education_saved), Toast.LENGTH_SHORT).show();
+                    finish();
+                },
+                err -> Toast.makeText(this,
+                        getString(R.string.error_save_failed, err),
+                        Toast.LENGTH_SHORT).show());
     }
 
     private String str(TextInputEditText field) {

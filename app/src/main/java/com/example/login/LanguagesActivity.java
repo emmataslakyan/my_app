@@ -17,8 +17,8 @@ public class LanguagesActivity extends BaseActivity {
     private RecyclerView rvLanguages;
     private LanguageAdapter adapter;
     private final List<String> langList = new ArrayList<>(); // "Language:Proficiency"
-    private AppDatabase db;
-    private int resumeId;
+    private ResumeRepository repo;
+    private String resumeId;
     private Resume resume;
 
     private UserProfileManager profileManager;
@@ -29,9 +29,9 @@ public class LanguagesActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_languages);
 
-        db = AppDatabase.getInstance(this);
-        resumeId = getIntent().getIntExtra("RESUME_ID", -1);
-        isProfileMode = (resumeId == ProfileActivity.PROFILE_RESUME_ID);
+        repo = new ResumeRepository();
+        resumeId = getIntent().getStringExtra("RESUME_ID");
+        isProfileMode = ProfileActivity.PROFILE_RESUME_ID.equals(resumeId);
         profileManager = new UserProfileManager();
 
         rvLanguages = findViewById(R.id.rvLanguages);
@@ -63,18 +63,17 @@ public class LanguagesActivity extends BaseActivity {
 
     private void loadData() {
         if (isProfileMode) { loadProfileLanguages(); return; }
-        new Thread(() -> {
-            resume = db.resumeDao().getResumeById(resumeId);
-            if (resume != null && resume.getLanguages() != null && !resume.getLanguages().isEmpty()) {
-                langList.addAll(Arrays.asList(resume.getLanguages().split("\\|")));
+        if (resumeId == null || resumeId.isEmpty()) return;
+        repo.get(resumeId, r -> {
+            resume = r;
+            if (r.getLanguages() != null && !r.getLanguages().isEmpty()) {
+                langList.addAll(Arrays.asList(r.getLanguages().split("\\|")));
             } else {
                 langList.add(":Fluent");
             }
-            runOnUiThread(() -> {
-                adapter = new LanguageAdapter(langList);
-                rvLanguages.setAdapter(adapter);
-            });
-        }).start();
+            adapter = new LanguageAdapter(langList);
+            rvLanguages.setAdapter(adapter);
+        }, err -> Toast.makeText(this, "Couldn't load resume: " + err, Toast.LENGTH_SHORT).show());
     }
 
     private void loadProfileLanguages() {
@@ -111,13 +110,13 @@ public class LanguagesActivity extends BaseActivity {
                             Toast.makeText(this, "Save failed: " + err, Toast.LENGTH_SHORT).show()));
             return;
         }
-        new Thread(() -> {
-            resume.setLanguages(sb.toString());
-            db.resumeDao().update(resume);
-            runOnUiThread(() -> {
-                Toast.makeText(this, "Languages Saved!", Toast.LENGTH_SHORT).show();
-                finish();
-            });
-        }).start();
+        if (resume == null) return;
+        resume.setLanguages(sb.toString());
+        repo.update(resume,
+                () -> {
+                    Toast.makeText(this, "Languages Saved!", Toast.LENGTH_SHORT).show();
+                    finish();
+                },
+                err -> Toast.makeText(this, "Save failed: " + err, Toast.LENGTH_SHORT).show());
     }
 }

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -11,28 +12,35 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class EducationListActivity extends BaseActivity {
 
-    private AppDatabase db;
-    private int resumeId;
+    private ResumeRepository repo;
+    private String resumeId;
     private Resume resume;
     private List<EducationEntry> entries = new ArrayList<>();
+    private final List<String> firestoreIds = new ArrayList<>();
     private EducationListAdapter adapter;
 
     private RecyclerView rv;
     private TextView emptyView;
+
+    private UserProfileManager profileManager;
+    private boolean isProfileMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_education_list);
 
-        db = AppDatabase.getInstance(this);
-        resumeId = getIntent().getIntExtra("RESUME_ID", -1);
+        repo = new ResumeRepository();
+        resumeId = getIntent().getStringExtra("RESUME_ID");
+        isProfileMode = ProfileActivity.PROFILE_RESUME_ID.equals(resumeId);
+        profileManager = new UserProfileManager();
 
         findViewById(R.id.backBtn).setOnClickListener(v -> finish());
-        findViewById(R.id.btnAddEntry).setOnClickListener(v -> openEditor(-1));
+        findViewById(R.id.btnAddEntry).setOnClickListener(v -> openEditor(-1, null));
 
         rv = findViewById(R.id.rvEntries);
         emptyView = findViewById(R.id.emptyView);
@@ -41,7 +49,9 @@ public class EducationListActivity extends BaseActivity {
         adapter = new EducationListAdapter(entries, new EducationListAdapter.Listener() {
             @Override
             public void onEntryClick(int position) {
-                openEditor(position);
+                String fsId = (isProfileMode && position < firestoreIds.size())
+                        ? firestoreIds.get(position) : null;
+                openEditor(position, fsId);
             }
             @Override
             public void onEntryDelete(int position) {
@@ -58,25 +68,45 @@ public class EducationListActivity extends BaseActivity {
     }
 
     private void reload() {
-        if (resumeId == -1) return;
-        new Thread(() -> {
-            resume = db.resumeDao().getResumeById(resumeId);
-            List<EducationEntry> parsed = (resume == null)
-                    ? new ArrayList<>()
-                    : ResumeEntries.parseEducation(resume.getEducationJson());
-            runOnUiThread(() -> {
-                entries.clear();
-                entries.addAll(parsed);
-                adapter.notifyDataSetChanged();
-                emptyView.setVisibility(entries.isEmpty() ? View.VISIBLE : View.GONE);
-            });
-        }).start();
+        if (isProfileMode) { reloadFromFirestore(); return; }
+        if (resumeId == null || resumeId.isEmpty()) return;
+        repo.get(resumeId, r -> {
+            resume = r;
+            entries.clear();
+            entries.addAll(ResumeEntries.parseEducation(r.getEducationJson()));
+            adapter.notifyDataSetChanged();
+            emptyView.setVisibility(entries.isEmpty() ? View.VISIBLE : View.GONE);
+        }, err -> {
+            entries.clear();
+            adapter.notifyDataSetChanged();
+            emptyView.setVisibility(View.VISIBLE);
+        });
     }
 
-    private void openEditor(int index) {
+    private void reloadFromFirestore() {
+        profileManager.loadEducation(list -> runOnUiThread(() -> {
+            entries.clear();
+            firestoreIds.clear();
+            for (Map<String, Object> e : list) {
+                EducationEntry entry = new EducationEntry();
+                entry.schoolName        = getStr(e, UserProfileManager.EDU_SCHOOL);
+                entry.schoolLocation    = getStr(e, UserProfileManager.EDU_LOCATION);
+                entry.schoolDate        = getStr(e, UserProfileManager.EDU_DATE);
+                entry.degree            = getStr(e, UserProfileManager.EDU_DEGREE);
+                entry.schoolDescription = getStr(e, UserProfileManager.EDU_DESCRIPTION);
+                entries.add(entry);
+                firestoreIds.add(getStr(e, UserProfileManager.EDU_ID));
+            }
+            adapter.notifyDataSetChanged();
+            emptyView.setVisibility(entries.isEmpty() ? View.VISIBLE : View.GONE);
+        }), err -> {});
+    }
+
+    private void openEditor(int index, String firestoreId) {
         Intent i = new Intent(this, EducationActivity.class);
         i.putExtra("RESUME_ID", resumeId);
         i.putExtra(EducationActivity.EXTRA_ENTRY_INDEX, index);
+        if (firestoreId != null) i.putExtra(EducationActivity.EXTRA_FIRESTORE_ID, firestoreId);
         startActivity(i);
     }
 
@@ -92,12 +122,31 @@ public class EducationListActivity extends BaseActivity {
     }
 
     private void performDelete(int position) {
-        if (resume == null || position < 0 || position >= entries.size()) return;
+        if (position < 0 || position >= entries.size()) return;
+        if (isProfileMode) {
+            String fsId = position < firestoreIds.size() ? firestoreIds.get(position) : null;
+            if (fsId != null) {
+                profileManager.deleteEducationEntry(fsId, () -> {}, err -> {});
+            }
+            entries.remove(position);
+            firestoreIds.remove(position);
+            adapter.notifyItemRemoved(position);
+            emptyView.setVisibility(entries.isEmpty() ? View.VISIBLE : View.GONE);
+            return;
+        }
+        if (resume == null) return;
         entries.remove(position);
         adapter.notifyItemRemoved(position);
         emptyView.setVisibility(entries.isEmpty() ? View.VISIBLE : View.GONE);
 
         resume.setEducationJson(ResumeEntries.serializeEducation(entries));
-        new Thread(() -> db.resumeDao().update(resume)).start();
+        repo.update(resume,
+                () -> {},
+                err -> Toast.makeText(this, "Delete failed: " + err, Toast.LENGTH_SHORT).show());
+    }
+
+    private String getStr(Map<String, Object> map, String key) {
+        Object v = map.get(key);
+        return v != null ? v.toString() : "";
     }
 }

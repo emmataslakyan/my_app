@@ -1,7 +1,6 @@
 package com.example.login;
 
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
 import android.widget.Toast;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,8 +14,8 @@ public class SkillsActivity extends BaseActivity {
     private RecyclerView rvSkills;
     private SkillAdapter adapter;
     private final List<String> skillList = new ArrayList<>(); // Stores "SkillName:Level"
-    private AppDatabase db;
-    private int resumeId;
+    private ResumeRepository repo;
+    private String resumeId;
     private Resume resume;
 
     private UserProfileManager profileManager;
@@ -27,9 +26,9 @@ public class SkillsActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_skills);
 
-        db = AppDatabase.getInstance(this);
-        resumeId = getIntent().getIntExtra("RESUME_ID", -1);
-        isProfileMode = (resumeId == ProfileActivity.PROFILE_RESUME_ID);
+        repo = new ResumeRepository();
+        resumeId = getIntent().getStringExtra("RESUME_ID");
+        isProfileMode = ProfileActivity.PROFILE_RESUME_ID.equals(resumeId);
         profileManager = new UserProfileManager();
         rvSkills = findViewById(R.id.rvSkills);
         rvSkills.setLayoutManager(new LinearLayoutManager(this));
@@ -57,18 +56,17 @@ public class SkillsActivity extends BaseActivity {
 
     private void loadData() {
         if (isProfileMode) { loadProfileSkills(); return; }
-        new Thread(() -> {
-            resume = db.resumeDao().getResumeById(resumeId);
-            if (resume != null && resume.getSkills() != null) {
-                skillList.addAll(Arrays.asList(resume.getSkills().split("\\|")));
+        if (resumeId == null || resumeId.isEmpty()) return;
+        repo.get(resumeId, r -> {
+            resume = r;
+            if (r.getSkills() != null && !r.getSkills().isEmpty()) {
+                skillList.addAll(Arrays.asList(r.getSkills().split("\\|")));
             } else {
                 skillList.add(":Beginner");
             }
-            runOnUiThread(() -> {
-                adapter = new SkillAdapter(skillList);
-                rvSkills.setAdapter(adapter);
-            });
-        }).start();
+            adapter = new SkillAdapter(skillList);
+            rvSkills.setAdapter(adapter);
+        }, err -> Toast.makeText(this, "Couldn't load resume: " + err, Toast.LENGTH_SHORT).show());
     }
 
     private void loadProfileSkills() {
@@ -105,13 +103,13 @@ public class SkillsActivity extends BaseActivity {
                             Toast.makeText(this, "Save failed: " + err, Toast.LENGTH_SHORT).show()));
             return;
         }
-        new Thread(() -> {
-            resume.setSkills(sb.toString());
-            db.resumeDao().update(resume);
-            runOnUiThread(() -> {
-                Toast.makeText(this, "Skills Saved!", Toast.LENGTH_SHORT).show();
-                finish();
-            });
-        }).start();
+        if (resume == null) return;
+        resume.setSkills(sb.toString());
+        repo.update(resume,
+                () -> {
+                    Toast.makeText(this, "Skills Saved!", Toast.LENGTH_SHORT).show();
+                    finish();
+                },
+                err -> Toast.makeText(this, "Save failed: " + err, Toast.LENGTH_SHORT).show());
     }
 }

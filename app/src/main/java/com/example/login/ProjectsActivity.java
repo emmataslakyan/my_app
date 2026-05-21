@@ -6,7 +6,7 @@ import com.google.android.material.textfield.TextInputEditText;
 
 public class ProjectsActivity extends BaseActivity {
 
-    private int currentResumeId = -1;
+    private String currentResumeId;
     private TextInputEditText etProjectName, etRole, etBulletPoints;
     private TextInputEditText etStartMonth, etStartYear, etEndMonth, etEndYear;
 
@@ -15,8 +15,8 @@ public class ProjectsActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_projects);
 
-        // Retrieve ID from intent
-        currentResumeId = getIntent().getIntExtra("RESUME_ID", -1);
+        currentResumeId = getIntent().getStringExtra("RESUME_ID");
+        if (currentResumeId == null) currentResumeId = "";
 
         // Initialize Views
         etProjectName = findViewById(R.id.etProjectName);

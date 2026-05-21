@@ -7,12 +7,11 @@ import android.webkit.WebView;
 import android.widget.Toast;
 
 import java.util.Map;
-import java.util.concurrent.Executors;
 
 public class ResumeViewActivity extends BaseActivity {
 
-    private int resumeId;
-    private AppDatabase db;
+    private String resumeId;
+    private ResumeRepository resumeRepo;
     private WebView webView;
     private TemplateRepository repository;
 
@@ -21,8 +20,8 @@ public class ResumeViewActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_resume_view);
 
-        resumeId = getIntent().getIntExtra("RESUME_ID", -1);
-        db = AppDatabase.getInstance(this);
+        resumeId = getIntent().getStringExtra("RESUME_ID");
+        resumeRepo = new ResumeRepository();
         repository = new TemplateRepository(this);
 
         View backBtn = findViewById(R.id.backBtn);
@@ -41,12 +40,11 @@ public class ResumeViewActivity extends BaseActivity {
     }
 
     private void loadResumeData() {
-        Executors.newSingleThreadExecutor().execute(() -> {
-            Resume resume = db.resumeDao().getResumeById(resumeId);
-            if (resume == null) {
-                runOnUiThread(() -> Toast.makeText(this, "Resume not found", Toast.LENGTH_SHORT).show());
-                return;
-            }
+        if (resumeId == null || resumeId.isEmpty()) {
+            Toast.makeText(this, "Resume not found", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        resumeRepo.get(resumeId, resume -> {
             if (webView == null) return;
             ResumeTemplate tpl = resolveTemplate(resume.getTemplateId());
             Map<String, Object> ctx = ResumeDataMapper.toContext(resume);
@@ -61,7 +59,7 @@ public class ResumeViewActivity extends BaseActivity {
                             "Couldn't load template", Toast.LENGTH_SHORT).show());
                 }
             });
-        });
+        }, err -> Toast.makeText(this, "Resume not found", Toast.LENGTH_SHORT).show());
     }
 
     private ResumeTemplate resolveTemplate(String id) {

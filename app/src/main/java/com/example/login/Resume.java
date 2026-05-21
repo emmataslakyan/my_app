@@ -1,14 +1,13 @@
 package com.example.login;
 
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
-import androidx.room.Ignore;
-import androidx.room.PrimaryKey;
-
-@Entity(tableName = "resumes")
+/**
+ * Plain POJO. Persisted via {@link ResumeRepository} to Firestore at
+ * {@code users/<uid>/resumes/<id>}. The {@code id} is the Firestore document ID
+ * and is populated when a resume is loaded; new instances start with an empty id
+ * until {@link ResumeRepository#create} returns.
+ */
 public class Resume {
-    @PrimaryKey(autoGenerate = true)
-    private int id;
+    private String id = "";
     private String title;
     private String email;
     private String date;
@@ -17,7 +16,6 @@ public class Resume {
     private String address;
 
     // Education + Experience are JSON-encoded lists of entries.
-    // See EducationEntry / ExperienceEntry and ResumeEntries.
     private String educationJson;
     private String experienceJson;
 
@@ -36,16 +34,11 @@ public class Resume {
     private String projectBullets;
     private String languages;
 
-    // Photo
-    @ColumnInfo(name = "photo_path")
     private String photoPath;
-
-    @ColumnInfo(name = "template_id", defaultValue = "default")
     private String templateId = "default";
 
     public Resume() {}
 
-    @Ignore
     public Resume(String title, String email, String date) {
         this.title = title;
         this.email = email;
@@ -53,8 +46,8 @@ public class Resume {
     }
 
     // --- Core Getters and Setters ---
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id == null ? "" : id; }
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
     public String getEmail() { return email; }
@@ -68,21 +61,17 @@ public class Resume {
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
 
-    // --- Photo ---
     public String getPhotoPath() { return photoPath; }
     public void setPhotoPath(String photoPath) { this.photoPath = photoPath; }
 
-    // --- Template ---
     public String getTemplateId() { return templateId; }
     public void setTemplateId(String templateId) { this.templateId = templateId; }
 
-    // --- Education / Experience (JSON lists) ---
     public String getEducationJson() { return educationJson; }
     public void setEducationJson(String educationJson) { this.educationJson = educationJson; }
     public String getExperienceJson() { return experienceJson; }
     public void setExperienceJson(String experienceJson) { this.experienceJson = experienceJson; }
 
-    // --- Volunteering ---
     public String getVolOrgName() { return volOrgName; }
     public void setVolOrgName(String volOrgName) { this.volOrgName = volOrgName; }
     public String getVolPosition() { return volPosition; }
@@ -94,7 +83,6 @@ public class Resume {
     public String getVolBullets() { return volBullets; }
     public void setVolBullets(String volBullets) { this.volBullets = volBullets; }
 
-    // --- Skills, Projects, Languages ---
     public String getSkills() { return skills; }
     public void setSkills(String skills) { this.skills = skills; }
     public String getProjectName() { return projectName; }

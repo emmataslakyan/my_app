@@ -15,8 +15,8 @@ import java.util.Map;
 
 public class ExperienceListActivity extends BaseActivity {
 
-    private AppDatabase db;
-    private int resumeId;
+    private ResumeRepository repo;
+    private String resumeId;
     private Resume resume;
     private List<ExperienceEntry> entries = new ArrayList<>();
     private final List<String> firestoreIds = new ArrayList<>();
@@ -33,9 +33,9 @@ public class ExperienceListActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_experience_list);
 
-        db = AppDatabase.getInstance(this);
-        resumeId = getIntent().getIntExtra("RESUME_ID", -1);
-        isProfileMode = (resumeId == ProfileActivity.PROFILE_RESUME_ID);
+        repo = new ResumeRepository();
+        resumeId = getIntent().getStringExtra("RESUME_ID");
+        isProfileMode = ProfileActivity.PROFILE_RESUME_ID.equals(resumeId);
         profileManager = new UserProfileManager();
 
         findViewById(R.id.backBtn).setOnClickListener(v -> finish());
@@ -68,19 +68,18 @@ public class ExperienceListActivity extends BaseActivity {
 
     private void reload() {
         if (isProfileMode) { reloadFromFirestore(); return; }
-        if (resumeId == -1) return;
-        new Thread(() -> {
-            resume = db.resumeDao().getResumeById(resumeId);
-            List<ExperienceEntry> parsed = (resume == null)
-                    ? new ArrayList<>()
-                    : ResumeEntries.parseExperience(resume.getExperienceJson());
-            runOnUiThread(() -> {
-                entries.clear();
-                entries.addAll(parsed);
-                adapter.notifyDataSetChanged();
-                emptyView.setVisibility(entries.isEmpty() ? View.VISIBLE : View.GONE);
-            });
-        }).start();
+        if (resumeId == null || resumeId.isEmpty()) return;
+        repo.get(resumeId, r -> {
+            resume = r;
+            entries.clear();
+            entries.addAll(ResumeEntries.parseExperience(r.getExperienceJson()));
+            adapter.notifyDataSetChanged();
+            emptyView.setVisibility(entries.isEmpty() ? View.VISIBLE : View.GONE);
+        }, err -> {
+            entries.clear();
+            adapter.notifyDataSetChanged();
+            emptyView.setVisibility(View.VISIBLE);
+        });
     }
 
     private void reloadFromFirestore() {
@@ -140,7 +139,7 @@ public class ExperienceListActivity extends BaseActivity {
         emptyView.setVisibility(entries.isEmpty() ? View.VISIBLE : View.GONE);
 
         resume.setExperienceJson(ResumeEntries.serializeExperience(entries));
-        new Thread(() -> db.resumeDao().update(resume)).start();
+        repo.update(resume, () -> {}, err -> {});
     }
 
     private String getStr(Map<String, Object> map, String key) {

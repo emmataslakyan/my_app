@@ -12,21 +12,15 @@ import androidx.appcompat.widget.PopupMenu;
 
 public class ResumeEditorActivity extends BaseActivity {
 
-    private int currentResumeId = -1;
+    private String currentResumeId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_resume_editor);
 
-        currentResumeId = getIntent().getIntExtra("RESUME_ID", -1);
-
-        // Sync the Firestore profile snapshot into SharedPreferences first,
-        // then set up the rest of the screen. This ensures that when the user
-        // opens Personal Details or Education, the fields are already pre-filled.
-        new UserProfileManager().applySnapshotToPrefs(this, currentResumeId, () ->
-                runOnUiThread(this::setupUI)
-        );
+        currentResumeId = getIntent().getStringExtra("RESUME_ID");
+        setupUI();
     }
 
     // ─── All UI setup moved here so it runs after the snapshot is ready ───────
