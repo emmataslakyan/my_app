@@ -116,8 +116,10 @@ public final class ResumeDataMapper {
     private static List<String> splitCsv(String raw) {
         List<String> out = new ArrayList<>();
         if (raw == null) return out;
-        for (String part : raw.split("[,\\n]")) {
+        for (String part : raw.split("[,\\n|]")) {
             String t = part.trim();
+            int colon = t.indexOf(':');
+            if (colon >= 0) t = t.substring(0, colon).trim();
             if (!t.isEmpty()) out.add(t);
         }
         return out;
