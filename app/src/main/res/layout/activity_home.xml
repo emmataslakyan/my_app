@@ -272,12 +272,11 @@
                  ════════════════════════════════════════ -->
             <LinearLayout
                 android:id="@+id/ai_section"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="74dp"
                 android:layout_marginBottom="28dp"
                 android:background="@drawable/buttonn"
                 android:clickable="true"
-                android:elevation="10dp"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackgroundBorderless"
                 android:gravity="center_vertical"
